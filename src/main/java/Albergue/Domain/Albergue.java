@@ -36,4 +36,8 @@ public class Albergue {
 
     @OneToMany(mappedBy = "albergue", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ProgramaVoluntariado> programasVoluntariado;
+
+    @Enumerated
+    @Column(name = "calidad")
+    private Rating rating;
 }
