@@ -1,0 +1,9 @@
+Post\Domain\Post.class
+Usuario\Domain\Usuario.class
+Comentarios\Domain\Comentario.class
+Albergue\Controller\AlbergueController.class
+Albergue\Domain\Albergue.class
+Animales\Controller\AnimalController.class
+Animales\Domain\Animal.class
+Voluntario\Domain\Voluntario.class
+Programa_voluntariado\Domain\ProgramaVoluntariado.class
