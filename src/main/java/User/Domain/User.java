@@ -1,10 +1,13 @@
 package User.Domain;
 
+import Albergue.Domain.Albergue;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.util.List;
 
 @Entity
 @Getter
@@ -25,5 +28,8 @@ public class User {
     private String email;
 
     private String password;
+
+    @ManyToMany(mappedBy = "albergues_seguidos")
+    private List<Albergue> albergues_seguidos;
 
 }
