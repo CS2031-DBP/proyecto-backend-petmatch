@@ -1,7 +1,7 @@
 package Comentarios.Domain;
 
 import Post.Domain.Post;
-import Usuario.Domain.Usuario;
+import User.Domain.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -27,7 +27,7 @@ public class Comentario {
     private Post post;
 
     @ManyToOne
-    @JoinColumn(name = "usuario_id")
-    private Usuario usuario;
+    @JoinColumn(name = "user_id")
+    private User user;
 
 }
