@@ -5,10 +5,11 @@ import VoluntarioPrograma.domain.VoluntarioProgramaId;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
 public interface InscripcionRepository extends JpaRepository<Inscripcion, VoluntarioProgramaId> {
 
-    boolean existsById(VoluntarioProgramaId id);
-
+    Optional<Inscripcion> findByVoluntarioIdAndProgramaVoluntariadoId(Long voluntarioId, Long programaId);
     boolean existsByVoluntarioIdAndProgramaVoluntariadoId(Long voluntarioId, Long programaId);
 }

@@ -2,6 +2,7 @@ package Common;
 
 import Programa_voluntariado.exception.ProgramaIsFullException;
 import Programa_voluntariado.exception.ProgramaNotFoundException;
+import Voluntario.exception.VoluntarioNotFoundException;
 import VoluntarioPrograma.exception.AlreadyEnrolledException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -36,6 +37,13 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> handleProgramaIsFull(ProgramaIsFullException e){
         return ResponseEntity
                 .status(HttpStatus.CONFLICT)
+                .body(e.getMessage());
+    }
+
+    @ExceptionHandler(VoluntarioNotFoundException.class)
+    public ResponseEntity<String> handleVoluntarioNotFound(VoluntarioNotFoundException e){
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
                 .body(e.getMessage());
     }
 

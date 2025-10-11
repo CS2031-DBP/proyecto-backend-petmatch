@@ -12,6 +12,7 @@ import User.Infraestructure.UserRepository;
 import User.dto.UserResponseDto;
 import Voluntario.Domain.Voluntario;
 import Voluntario.Infraestructure.VoluntarioRepository;
+import Voluntario.exception.VoluntarioNotFoundException;
 import VoluntarioPrograma.domain.Inscripcion;
 import VoluntarioPrograma.exception.AlreadyEnrolledException;
 import VoluntarioPrograma.infrastructure.InscripcionRepository;
@@ -79,6 +80,17 @@ public class ProgramaService {
         voluntario.addInscripcion(programa);
         Inscripcion inscripcion = new Inscripcion(voluntario, programa);
         inscripcionRepository.save(inscripcion);
+    }
+
+    public void desinscribirVoluntarioDePrograma(Long programaId, Long voluntarioId) {
+        ProgramaVoluntariado programa = programaVoluntariadoRepositorio.findById(programaId)
+                .orElseThrow(() -> new ProgramaNotFoundException("Programa de voluntariado con id " + programaId + " no encontrado"));
+        Voluntario voluntario = voluntarioRepository.findById(voluntarioId)
+                .orElseThrow(() -> new VoluntarioNotFoundException("Voluntario con id " + voluntarioId + " no encontrado"));
+        Inscripcion inscripcion = inscripcionRepository.findByVoluntarioIdAndProgramaVoluntariadoId(voluntarioId, programaId)
+                .orElseThrow(() -> new RuntimeException("El voluntario con id " + voluntarioId + " no está inscrito en el programa con id " + programaId));
+        voluntario.removeInscripcion(programa);
+        inscripcionRepository.delete(inscripcion);
     }
 
     public Voluntario encontrarOCrearVoluntario(Long usuarioId) {

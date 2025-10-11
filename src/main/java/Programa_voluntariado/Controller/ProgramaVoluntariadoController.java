@@ -46,4 +46,12 @@ public class ProgramaVoluntariadoController {
         return ResponseEntity.ok().build();
     }
 
+    @DeleteMapping("/{id}/inscripcion")
+    public ResponseEntity<Void> desinscribirVoluntarioDePrograma(@PathVariable Long id, @RequestParam Long voluntarioId) {
+        programaService.desinscribirVoluntarioDePrograma(id, voluntarioId);
+        return ResponseEntity.noContent().build();
+    }
+
+
+
 }
