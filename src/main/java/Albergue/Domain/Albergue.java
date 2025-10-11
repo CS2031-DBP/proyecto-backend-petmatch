@@ -19,6 +19,7 @@ import java.util.List;
 @NoArgsConstructor
 @Table(name = "albergues")
 public class Albergue {
+
     @Id
     @GeneratedValue(strategy = jakarta.persistence.GenerationType.IDENTITY)
     private Long id;
