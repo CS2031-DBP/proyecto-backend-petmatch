@@ -25,7 +25,7 @@ public class Post {
 
     private String title;
 
-    private String necessities;
+    private List<String> necessities;
 
     @ManyToOne
     @JoinColumn(name = "albergue_id")

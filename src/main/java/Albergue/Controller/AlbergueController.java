@@ -9,6 +9,7 @@ import Common.ValidationException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -37,7 +38,8 @@ public class AlbergueController {
     @PreAuthorize("permitAll()")
     public ResponseEntity<NewIdDTO> createAlbergue(@Valid @RequestBody AlbergueRegisterDTO albergue) throws Exception {
         Albergue albergueEntity = albergueService.newAlbergue(albergue);
-        return ResponseEntity.created(null).body(new NewIdDTO(albergueEntity.getId()));
+        return ResponseEntity.status(HttpStatus.CREATED).body(new NewIdDTO(albergueEntity.getId()));
     }
+
 
 }

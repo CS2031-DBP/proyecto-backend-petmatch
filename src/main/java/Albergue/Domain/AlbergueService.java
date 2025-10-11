@@ -23,6 +23,8 @@ public class AlbergueService {
     public List<Albergue> findAll(){
         return albergueRepository.findAll();
     }
+
+
     public Albergue newAlbergue(AlbergueRegisterDTO albergueDTO) throws ValidationException {
         String pwd = albergueDTO.getPassword();
         if (!Pattern.matches(".*[A-Z].*", pwd) || !Pattern.matches(".*[0-9].*", pwd)) {
@@ -51,10 +53,10 @@ public class AlbergueService {
 
         var found = albergueRepository.findByName(albergueDTO.getName());
         if (found.isPresent()) {
-            throw new ValidationException("Username already exists");
+            throw new ValidationException("Este albergue ya existe");
+        } else {
+            albergueRepository.save(albergue);
         }
-
-        albergueRepository.save(albergue);
         return albergue;
     }
 }
