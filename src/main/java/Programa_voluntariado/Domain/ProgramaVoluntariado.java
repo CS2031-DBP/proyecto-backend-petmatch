@@ -3,7 +3,7 @@ package Programa_voluntariado.Domain;
 
 import Albergue.Domain.Albergue;
 import Voluntario.Domain.Voluntario;
-import VoluntarioPrograma.Inscripcion;
+import VoluntarioPrograma.domain.Inscripcion;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -58,6 +58,10 @@ public class ProgramaVoluntariado {
             voluntarios.add(inscripcion.getVoluntario());
         }
         return voluntarios;
+    }
+
+    public boolean isLleno(){
+        return status == ProgramaStatus.LLENO;
     }
 
 

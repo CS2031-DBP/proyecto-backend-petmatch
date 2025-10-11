@@ -31,5 +31,4 @@ public class User {
 
     @ManyToMany(mappedBy = "albergues_seguidos")
     private List<Albergue> albergues_seguidos;
-
 }

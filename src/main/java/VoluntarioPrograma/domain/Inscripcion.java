@@ -1,4 +1,4 @@
-package VoluntarioPrograma;
+package VoluntarioPrograma.domain;
 
 import Programa_voluntariado.Domain.ProgramaVoluntariado;
 import Voluntario.Domain.Voluntario;

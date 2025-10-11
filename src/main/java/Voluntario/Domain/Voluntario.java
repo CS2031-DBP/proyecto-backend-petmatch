@@ -3,7 +3,7 @@ package Voluntario.Domain;
 
 import Programa_voluntariado.Domain.ProgramaVoluntariado;
 import User.Domain.User;
-import VoluntarioPrograma.Inscripcion;
+import VoluntarioPrograma.domain.Inscripcion;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
@@ -21,14 +21,6 @@ import java.util.Objects;
 @Table(name = "voluntarios")
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 public class Voluntario extends User {
-
-    @Id
-    private Long id;
-
-    @OneToOne
-    @MapsId
-    @JoinColumn(name = "id")
-    private User usuario;
 
     @OneToMany(mappedBy = "voluntario", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<Inscripcion> inscripciones = new ArrayList<>();
