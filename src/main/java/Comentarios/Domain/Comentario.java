@@ -8,6 +8,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.Date;
+
 @Getter
 @Setter
 @Entity
@@ -22,6 +24,9 @@ public class Comentario {
 
     private String content;
 
+    private Date date;
+
+    // lógica para crear imagenes
     @ManyToOne
     @JoinColumn(name = "post_id")
     private Post post;

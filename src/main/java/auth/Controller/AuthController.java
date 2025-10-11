@@ -1,8 +1,9 @@
-package Comentarios.Controller;
+package auth.Controller;
 
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-public class ComentarioController {
+@RequestMapping("/auth")
+public class AuthController {
 }

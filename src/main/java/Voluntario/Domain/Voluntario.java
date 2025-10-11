@@ -1,10 +1,12 @@
 package Voluntario.Domain;
 
+
 import Programa_voluntariado.Domain.ProgramaVoluntariado;
 import User.Domain.User;
 import VoluntarioPrograma.Inscripcion;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
