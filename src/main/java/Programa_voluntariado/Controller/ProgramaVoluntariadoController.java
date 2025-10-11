@@ -52,6 +52,10 @@ public class ProgramaVoluntariadoController {
         return ResponseEntity.noContent().build();
     }
 
-
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deletePrograma(@PathVariable Long id) {
+        programaService.deletePrograma(id);
+        return ResponseEntity.noContent().build();
+    }
 
 }

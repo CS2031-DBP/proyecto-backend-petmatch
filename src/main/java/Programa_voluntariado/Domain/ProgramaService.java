@@ -93,6 +93,13 @@ public class ProgramaService {
         inscripcionRepository.delete(inscripcion);
     }
 
+    public void deletePrograma(Long id) {
+        if (!programaVoluntariadoRepositorio.existsById(id)) {
+            throw new ProgramaNotFoundException("Programa de voluntariado con id " + id + " no encontrado");
+        }
+        programaVoluntariadoRepositorio.deleteById(id);
+    }
+
     public Voluntario encontrarOCrearVoluntario(Long usuarioId) {
         return voluntarioRepository.findById(usuarioId).orElseGet(() -> {
             if (!userRepository.existsById(usuarioId)) {
