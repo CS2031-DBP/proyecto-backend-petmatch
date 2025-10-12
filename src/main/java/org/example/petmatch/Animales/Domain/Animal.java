@@ -1,13 +1,11 @@
 package org.example.petmatch.Animales.Domain;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.example.petmatch.Albergue.Domain.Albergue;
 
 @Entity
 @Getter
@@ -26,5 +24,8 @@ public class Animal {
 
     private String breed;
 
+    @ManyToOne
+    @JoinColumn(name = "albergue_id")
+    private Albergue albergue;
 
 }
