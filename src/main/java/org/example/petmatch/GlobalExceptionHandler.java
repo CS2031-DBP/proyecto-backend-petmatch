@@ -1,6 +1,6 @@
 package org.example.petmatch;
 
-import org.example.petmatch.Albergue.Exception.NotFoundException;
+import org.example.petmatch.Exception.NotFoundException;
 import org.example.petmatch.Common.ValidationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

@@ -4,21 +4,15 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
-import java.util.List;
-
 @Data
-public class PostViewDTO {
+public class RequestPostDTO {
 
     @NotNull
-    @NotNull
-    private Long title;
+    @NotEmpty
+    private String title;
 
     @NotNull
     @NotEmpty
     private String necessities;
-
-    @NotNull
-    @NotEmpty
-    private String albergue_name;
 
 }

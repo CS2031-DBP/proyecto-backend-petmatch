@@ -1,7 +1,7 @@
 package org.example.petmatch.Albergue.Domain;
 
 import org.example.petmatch.Albergue.DTO.AlbergueRegisterDTO;
-import org.example.petmatch.Albergue.Exception.NotFoundException;
+import org.example.petmatch.Exception.NotFoundException;
 import org.example.petmatch.Albergue.Infraestructure.AlbergueRepository;
 import lombok.RequiredArgsConstructor;
 import org.example.petmatch.Common.ValidationException;
