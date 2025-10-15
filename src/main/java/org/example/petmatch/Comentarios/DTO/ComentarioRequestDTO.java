@@ -5,7 +5,8 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 @Data
-public class ComentarioResponseDTO {
+public class ComentarioRequestDTO {
+
     @NotNull
     @NotEmpty
     private String content;
@@ -17,5 +18,4 @@ public class ComentarioResponseDTO {
     @NotNull
     @NotEmpty
     private String user_name;
-
 }

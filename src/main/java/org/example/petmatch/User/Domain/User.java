@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.example.petmatch.Albergue.Domain.Albergue;
+import org.example.petmatch.Comentarios.Domain.Comentario;
+import org.example.petmatch.Post.Domain.Post;
 
 import java.util.List;
 
@@ -31,5 +33,8 @@ public class User {
 
     @ManyToMany(mappedBy = "albergues_seguidos")
     private List<Albergue> albergues_seguidos;
+
+    @OneToMany(mappedBy = "User")
+    private List<Comentario> comentarios ;
 
 }

@@ -1,13 +1,11 @@
 package org.example.petmatch.Comentarios.Controller;
 
 import lombok.RequiredArgsConstructor;
+import org.example.petmatch.Comentarios.DTO.ComentarioResponseDTO;
 import org.example.petmatch.Comentarios.Domain.Comentario;
-import org.example.petmatch.Comentarios.Infraestructure.ComentarioRepository;
+import org.example.petmatch.Comentarios.Domain.ComentarioService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -16,16 +14,18 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ComentarioController {
 
-    private final ComentarioRepository comentarioRepository;
+    private final ComentarioService comentarioService;
 
     @GetMapping("/{user_name}")
-    public ResponseEntity<List<Comentario>> getComentariosByUsername(@PathVariable("user_name") String username){
-        List<Comentario> CommmentsByUser = comentarioRepository.getAllComentsByUser(username);
+    public ResponseEntity<List<ComentarioResponseDTO>> getComentariosByUsername(@PathVariable("user_name") String username){
+        List<ComentarioResponseDTO> CommmentsByUser = comentarioService.getAllComentsByUser(username);
         return ResponseEntity.ok(CommmentsByUser);
     }
 
     @GetMapping("/by_post/{post_name}")
-    public ResponseEntity<List<Comentario>>
-
+    public ResponseEntity<List<ComentarioResponseDTO>> getComentariosByPostTitle(@PathVariable("post_name") String post_title){
+        List<ComentarioResponseDTO> CommentsByPost = comentarioService.getAllByPosttitle(post_title);
+        return ResponseEntity.ok(CommentsByPost);
+    }
 
 }
