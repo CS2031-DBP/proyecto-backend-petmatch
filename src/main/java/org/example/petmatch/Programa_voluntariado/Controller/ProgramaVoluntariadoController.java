@@ -1,10 +1,14 @@
 package org.example.petmatch.Programa_voluntariado.Controller;
 
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.example.petmatch.Common.NewIdDTO;
 import org.example.petmatch.Programa_voluntariado.DTO.ProgramaRequestDto;
 import org.example.petmatch.Programa_voluntariado.DTO.ProgramaResponseDto;
 import org.example.petmatch.Programa_voluntariado.Domain.ProgramaService;
+import org.example.petmatch.Voluntario.dto.VoluntarioResponseDto;
+import org.modelmapper.ModelMapper;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,16 +19,17 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ProgramaVoluntariadoController {
     private final ProgramaService programaService;
+    private final ModelMapper modelMapper;
 
     @GetMapping
     public ResponseEntity<List<ProgramaResponseDto>> getAllProgramas() {
-        List<ProgramaResponseDto> programas = programaService.getAllProgramas();
+        List<ProgramaResponseDto> programas = programaService.getAllProgramas().stream().map(programa -> modelMapper.map(programa, ProgramaResponseDto.class)).toList();
         return ResponseEntity.ok(programas);
     }
 
     @GetMapping("/{id}/voluntarios")
-    public ResponseEntity<List<UserResponseDto>> getAllVoluntariosInPrograma(@PathVariable Long id) {
-        List<UserResponseDto> voluntarios = programaService.getAllVoluntariosInPrograma(id);
+    public ResponseEntity<List<VoluntarioResponseDto>> getAllVoluntariosInPrograma(@PathVariable Long id) {
+        List<VoluntarioResponseDto> voluntarios = programaService.getAllVoluntariosInPrograma(id);
         return ResponseEntity.ok(voluntarios);
     }
 

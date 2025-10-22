@@ -1,7 +1,10 @@
 package org.example.petmatch.Programa_voluntariado.DTO;
 
 
+import jakarta.validation.constraints.*;
 import lombok.Data;
+
+import java.time.ZonedDateTime;
 
 @Data
 public class ProgramaRequestDto {

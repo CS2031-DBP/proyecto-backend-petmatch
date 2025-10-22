@@ -3,16 +3,21 @@ package org.example.petmatch.Programa_voluntariado.Domain;
 import lombok.RequiredArgsConstructor;
 import org.example.petmatch.Albergue.Domain.Albergue;
 import org.example.petmatch.Albergue.Infraestructure.AlbergueRepository;
+import org.example.petmatch.Common.NewIdDTO;
 import org.example.petmatch.Inscripcion.domain.Inscripcion;
 import org.example.petmatch.Inscripcion.exception.AlreadyEnrolledException;
 import org.example.petmatch.Inscripcion.infrastructure.InscripcionRepository;
 import org.example.petmatch.Programa_voluntariado.DTO.ProgramaRequestDto;
+import org.example.petmatch.Programa_voluntariado.DTO.ProgramaResponseDto;
 import org.example.petmatch.Programa_voluntariado.Infraestructure.ProgramaVoluntariadoRepository;
 import org.example.petmatch.Programa_voluntariado.exception.ProgramaIsFullException;
 import org.example.petmatch.Programa_voluntariado.exception.ProgramaNotFoundException;
 import org.example.petmatch.User.Infraestructure.UserRepository;
 import org.example.petmatch.Voluntario.Domain.Voluntario;
 import org.example.petmatch.Voluntario.Infraestructure.VoluntarioRepository;
+import org.example.petmatch.Voluntario.dto.VoluntarioResponseDto;
+import org.example.petmatch.Voluntario.exception.VoluntarioNotFoundException;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,11 +41,11 @@ public class ProgramaService {
         return programasDtos;
     }
 
-    public List<UserResponseDto> getAllVoluntariosInPrograma(Long id) {
+    public List<VoluntarioResponseDto> getAllVoluntariosInPrograma(Long id) {
         ProgramaVoluntariado programa = programaVoluntariadoRepositorio.findById(id).orElseThrow(() -> new ProgramaNotFoundException("Programa de voluntariado con id" + id + " no encontrado"));
         List<Voluntario> voluntarios = programa.getVoluntarios();
-        List<UserResponseDto> usuarios = voluntarios.stream()
-                .map(voluntario -> modelMapper.map(voluntario, UserResponseDto.class))
+        List<VoluntarioResponseDto> usuarios = voluntarios.stream()
+                .map(voluntario -> modelMapper.map(voluntario, VoluntarioResponseDto.class))
                 .toList();
         return usuarios;
     }
