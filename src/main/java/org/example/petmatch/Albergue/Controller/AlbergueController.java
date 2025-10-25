@@ -3,14 +3,12 @@ package org.example.petmatch.Albergue.Controller;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.example.petmatch.Albergue.DTO.AlberguePresentationDTO;
-import org.example.petmatch.Albergue.DTO.AlbergueRegisterDTO;
 import org.example.petmatch.Albergue.DTO.Auth.AlbergueAuthResponseDto;
 import org.example.petmatch.Albergue.DTO.Auth.AlbergueAuthLoginRequestDto;
 import org.example.petmatch.Albergue.DTO.Auth.AlbergueAuthRegisterRequestDto;
 import org.example.petmatch.Albergue.Domain.Albergue;
 import org.example.petmatch.Albergue.Domain.AlbergueService;
-import org.example.petmatch.Common.NewIdDTO;
-import org.example.petmatch.Common.ValidationException;
+import org.example.petmatch.Albergue.Exceptions.ValidationException;
 import org.example.petmatch.GoogleApi.GoogleMapsService;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
@@ -102,6 +100,7 @@ public class AlbergueController {
     }
 
     @PostMapping("/auth/register")
+    @PreAuthorize("permitAll()")
     public ResponseEntity<AlbergueAuthResponseDto> register(
             @Valid @RequestBody AlbergueAuthRegisterRequestDto request) {
         AlbergueAuthResponseDto responseDto = albergueService.registerAlbergue(request);

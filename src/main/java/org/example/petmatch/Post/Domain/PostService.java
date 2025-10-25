@@ -2,9 +2,8 @@ package org.example.petmatch.Post.Domain;
 
 import lombok.RequiredArgsConstructor;
 import org.example.petmatch.Albergue.Domain.Albergue;
-import org.example.petmatch.Albergue.Domain.AlbergueService;
 import org.example.petmatch.Albergue.Infraestructure.AlbergueRepository;
-import org.example.petmatch.Common.ValidationException;
+import org.example.petmatch.Albergue.Exceptions.ValidationException;
 import org.example.petmatch.Exception.NotFoundException;
 import org.example.petmatch.Post.DTO.PostViewDTO;
 import org.example.petmatch.Post.DTO.RequestPostDTO;

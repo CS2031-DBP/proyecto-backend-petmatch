@@ -6,16 +6,9 @@ import lombok.Data;
 
 @Data
 public class ComentarioResponseDTO {
-    @NotNull
-    @NotEmpty
+
     private String content;
-
-    @NotNull
-    @NotEmpty
     private String post_name;
-
-    @NotNull
-    @NotEmpty
     private String user_name;
 
 }

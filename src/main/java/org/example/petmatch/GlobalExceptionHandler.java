@@ -3,7 +3,7 @@ package org.example.petmatch;
 import org.example.petmatch.Albergue.Exceptions.AlbergueAlreadyExistsException;
 import org.example.petmatch.Albergue.Exceptions.AlbergueNotFoundException;
 import org.example.petmatch.Exception.NotFoundException;
-import org.example.petmatch.Common.ValidationException;
+import org.example.petmatch.Albergue.Exceptions.ValidationException;
 import org.example.petmatch.User.Exceptions.InvalidCredentialsException;
 import org.example.petmatch.User.Exceptions.UserAlreadyExistsException;
 import org.example.petmatch.User.Exceptions.UserNotFoundException;
@@ -20,17 +20,17 @@ import java.util.Map;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(ValidationException.class)
-    public ResponseEntity<String> handleValidationException(ValidationException ex) {
-        return ResponseEntity
-                .status(HttpStatus.BAD_REQUEST)
-                .body(ex.getMessage());
-    }
+
     @ExceptionHandler(NotFoundException.class)
     public ResponseEntity<String> handleNotFoundException(NotFoundException ex) {
         return ResponseEntity
                 .status(HttpStatus.NOT_FOUND)
                 .body(ex.getMessage());
+    }
+
+    @ExceptionHandler(ValidationException.class)
+    public ResponseEntity<Map<String, Object>> handleValidationExceptionDetailed(ValidationException ex) {
+        return buildErrorResponse(HttpStatus.BAD_REQUEST, "Error de validacion", ex.getMessage());
     }
 
     @ExceptionHandler(InvalidCredentialsException.class)

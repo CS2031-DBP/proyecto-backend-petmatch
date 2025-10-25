@@ -5,10 +5,10 @@ import org.example.petmatch.Albergue.DTO.Auth.AlbergueAuthLoginRequestDto;
 import org.example.petmatch.Albergue.DTO.Auth.AlbergueAuthResponseDto;
 import org.example.petmatch.Albergue.DTO.Auth.AlbergueAuthRegisterRequestDto;
 import org.example.petmatch.Albergue.Exceptions.AlbergueAlreadyExistsException;
-import org.example.petmatch.Exception.NotFoundException;
+import org.example.petmatch.Albergue.Exceptions.AlbergueNotFoundException;
 import org.example.petmatch.Albergue.Infraestructure.AlbergueRepository;
 import lombok.RequiredArgsConstructor;
-import org.example.petmatch.Common.ValidationException;
+import org.example.petmatch.Albergue.Exceptions.ValidationException;
 import org.example.petmatch.GoogleApi.GoogleMapsService;
 import org.example.petmatch.Security.JwtService;
 import org.example.petmatch.User.Exceptions.InvalidCredentialsException;
@@ -78,7 +78,7 @@ public class AlbergueService {
     }
     @Transactional
     public Albergue actualizarAvailableSeats(Integer nMascotas, String albergue_name) throws Exception{
-        Albergue albergue = albergueRepository.findByName(albergue_name).orElseThrow(() -> new NotFoundException("No existe un albergue con ese nombre"));
+        Albergue albergue = albergueRepository.findByName(albergue_name).orElseThrow(() -> new AlbergueNotFoundException("No existe un albergue con ese nombre"));
 
         if (nMascotas < 0) {
             throw new ValidationException("No se puede dejar menos de 0 mascotas en el albergue");
@@ -90,7 +90,7 @@ public class AlbergueService {
     }
 
     public Albergue actualizardireccion(String newAddress, String albergue_name) throws Exception {
-        Albergue albergue = albergueRepository.findByName(albergue_name).orElseThrow(() -> new NotFoundException("No existe un albergue con ese nombre"));
+        Albergue albergue = albergueRepository.findByName(albergue_name).orElseThrow(() -> new AlbergueNotFoundException("No existe un albergue con ese nombre"));
         if (!googleMapsService.isValidAddress(newAddress)) {
             throw new ValidationException("La dirección proporcionada no es válida o no existe en Google Maps.");
         }
@@ -101,7 +101,7 @@ public class AlbergueService {
 
     @Transactional
     public Albergue actualizartelefono(Long telefono, String albergue_name) throws Exception{
-        Albergue albergue = albergueRepository.findByName(albergue_name).orElseThrow(() -> new NotFoundException("No existe un albergue con ese nombre"));
+        Albergue albergue = albergueRepository.findByName(albergue_name).orElseThrow(() -> new AlbergueNotFoundException("No existe un albergue con ese nombre"));
 
         if (!Pattern.matches("^(\\+?51)?9\\d{8}$", telefono.toString())){
             throw new ValidationException("El telefono debe tener el formato: +519XXXXXXXX or 9XXXXXXXX");
