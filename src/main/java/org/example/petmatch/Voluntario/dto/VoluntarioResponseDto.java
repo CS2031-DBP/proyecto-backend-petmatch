@@ -9,8 +9,7 @@ import lombok.Setter;
 @Setter
 public class VoluntarioResponseDto {
     private Long id;
-    private String nombre;
-    private String apellido;
+    private String name;
+    private String lastname;
     private String email;
-    private String telefono;
 }
