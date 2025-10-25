@@ -1,5 +1,7 @@
 package org.example.petmatch;
 
+import org.example.petmatch.Albergue.Exceptions.AlbergueAlreadyExistsException;
+import org.example.petmatch.Albergue.Exceptions.AlbergueNotFoundException;
 import org.example.petmatch.Exception.NotFoundException;
 import org.example.petmatch.Common.ValidationException;
 import org.example.petmatch.User.Exceptions.InvalidCredentialsException;
@@ -49,6 +51,18 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(UserNotFoundException.class)
     public ResponseEntity<Map<String, Object>> handleUserNotFoundException(UserNotFoundException ex) {
         return buildErrorResponse(HttpStatus.NOT_FOUND,  "El usuario ya se encuentra registrado", ex.getMessage());
+    }
+
+    @ExceptionHandler(AlbergueAlreadyExistsException.class)
+    public ResponseEntity<Map<String, Object>> handleAlbergueAlreadyExistsException(
+            AlbergueAlreadyExistsException ex) {
+        return buildErrorResponse(HttpStatus.CONFLICT, "El albergue ya se encuentra registrado", ex.getMessage());
+    }
+
+    @ExceptionHandler(AlbergueNotFoundException.class)
+    public ResponseEntity<Map<String, Object>> handleAlbergueNotFoundException(
+            AlbergueNotFoundException ex) {
+        return buildErrorResponse(HttpStatus.NOT_FOUND, "Albergue no encontardo", ex.getMessage());
     }
 
     private ResponseEntity<Map<String, Object>> buildErrorResponse(HttpStatus status, String error, String message) {

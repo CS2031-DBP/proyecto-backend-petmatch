@@ -23,6 +23,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
     private final UserDetailsServiceImpl userDetailsService;
+    private final AlbeguerDetailsServiceImpl albeguerDetailsService;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
@@ -37,9 +38,19 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
             if (jwtService.isTokenValid(token)) {
                 String email = jwtService.extractUsername(token);
+                String entityType = jwtService.extractEntityType(token); // ✅ Saber qué tipo es
 
                 if (StringUtils.hasText(email) && SecurityContextHolder.getContext().getAuthentication() == null) {
-                    UserDetails userDetails = userDetailsService.loadUserByUsername(email);
+                    UserDetails userDetails;
+
+                    if ("USER".equals(entityType)) {
+                        userDetails = userDetailsService.loadUserByUsername(email);
+                    } else if ("ALBERGUE".equals(entityType)) {
+                        userDetails = albeguerDetailsService.loadUserByUsername(email);
+                    } else {
+                        filterChain.doFilter(request, response);
+                        return;
+                    }
 
                     SecurityContext context = SecurityContextHolder.createEmptyContext();
                     UsernamePasswordAuthenticationToken authToken =
@@ -57,4 +68,5 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
         filterChain.doFilter(request, response);
     }
+
 }

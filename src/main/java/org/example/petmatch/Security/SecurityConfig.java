@@ -48,14 +48,24 @@ public class SecurityConfig {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        // Rutas públicas
+                        // ✅ Rutas públicas de autenticación (sin token)
                         .requestMatchers("/api/auth/user/**").permitAll()
+                        .requestMatchers("/api/auth/albergue/**").permitAll() // ✅ AGREGAR ESTO
 
-                        // Rutas protegidas solo para USER
+                        // ✅ Rutas públicas para consultar albergues (sin autenticación)
+                        .requestMatchers("/api/albergues").permitAll() // Ver todos los albergues
+                        .requestMatchers("/api/albergues/near").permitAll() // Ver albergues cercanos
+
+                        // ✅ Rutas protegidas - Solo usuarios autenticados
                         .requestMatchers("/api/user/**").hasRole("USER")
+
+                        // ✅ Rutas protegidas - Solo albergues autenticados
+                        .requestMatchers("/api/albergue/**").hasRole("ALBERGUE")
+
+                        // ✅ Rutas protegidas - Solo admins
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
 
-                        // Cualquier otra requiere autenticación
+                        // ✅ Cualquier otra ruta requiere autenticación
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session

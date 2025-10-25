@@ -4,6 +4,9 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.example.petmatch.Albergue.DTO.AlberguePresentationDTO;
 import org.example.petmatch.Albergue.DTO.AlbergueRegisterDTO;
+import org.example.petmatch.Albergue.DTO.Auth.AlbergueAuthResponseDto;
+import org.example.petmatch.Albergue.DTO.Auth.AlbergueAuthLoginRequestDto;
+import org.example.petmatch.Albergue.DTO.Auth.AlbergueAuthRegisterRequestDto;
 import org.example.petmatch.Albergue.Domain.Albergue;
 import org.example.petmatch.Albergue.Domain.AlbergueService;
 import org.example.petmatch.Common.NewIdDTO;
@@ -61,36 +64,55 @@ public class AlbergueController {
         return ResponseEntity.ok(nearby);
     }
 
-
-    @PostMapping("/register")
+    /*
+    @PostMapping("/nuevo")
     @PreAuthorize("permitAll()")
     public ResponseEntity<NewIdDTO> createAlbergue(@Valid @RequestBody AlbergueRegisterDTO albergue) throws Exception {
         Albergue albergueEntity = albergueService.newAlbergue(albergue);
         return ResponseEntity.status(HttpStatus.CREATED).body(new NewIdDTO(albergueEntity.getId()));
     }
+     */
 
     @DeleteMapping("/{name}")
+    @PreAuthorize("hasRole('ALBERGUE')")
     public ResponseEntity<Albergue> deleteAlbergue(@PathVariable String name) throws ValidationException {
         albergueService.deleteAlberguebyName(name);
         return ResponseEntity.noContent().build();
     }
 
     @PatchMapping("/mascotas_registradas/{n_mascotas}/{albergue_name}")
+    @PreAuthorize("hasRole('ALBERGUE')")
     public ResponseEntity<AlberguePresentationDTO> actualizarAvailableSeats(@PathVariable Integer n_mascotas, @PathVariable String albergue_name) throws Exception{
         Albergue albergue_actualizado = albergueService.actualizarAvailableSeats(n_mascotas, albergue_name);
         return ResponseEntity.ok(modelMapper.map(albergue_actualizado, AlberguePresentationDTO.class));
     }
 
     @PatchMapping("/actualizacion_address/{new_adrress}/{albergue_name}")
+    @PreAuthorize("hasRole('ALBERGUE')")
     public ResponseEntity<AlberguePresentationDTO> actualizaraddress(@PathVariable String new_adrress, @PathVariable String albergue_name) throws Exception{
         Albergue albergue_actualizado = albergueService.actualizardireccion(new_adrress, albergue_name);
         return ResponseEntity.ok(modelMapper.map(albergue_actualizado, AlberguePresentationDTO.class));
     }
 
     @PatchMapping("/actualizacion_telefono/{telefono}/{albergue_name}")
+    @PreAuthorize("hasRole('ALBERGUE')")
     public ResponseEntity<AlberguePresentationDTO> actualizartelefono(@PathVariable Long telefono, @PathVariable String albergue_name) throws Exception{
         Albergue albergue_actualizado = albergueService.actualizartelefono(telefono, albergue_name);
         return ResponseEntity.ok(modelMapper.map(albergue_actualizado, AlberguePresentationDTO.class));
+    }
+
+    @PostMapping("/auth/register")
+    public ResponseEntity<AlbergueAuthResponseDto> register(
+            @Valid @RequestBody AlbergueAuthRegisterRequestDto request) {
+        AlbergueAuthResponseDto responseDto = albergueService.registerAlbergue(request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(responseDto);
+    }
+
+    @PostMapping("/auth/login")
+    public ResponseEntity<AlbergueAuthResponseDto> login(
+            @Valid @RequestBody AlbergueAuthLoginRequestDto request) {
+        AlbergueAuthResponseDto responseDto = albergueService.loginAlbergue(request);
+        return ResponseEntity.ok(responseDto);
     }
 
 
