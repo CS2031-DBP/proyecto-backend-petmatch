@@ -15,7 +15,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class VoluntarioService {
     private final VoluntarioRepository voluntarioRepository;
-    private final InscripcionRepository inscripcionRepository;
     private final ModelMapper modelMapper;
 
     public List<VoluntarioResponseDto> getAllVoluntarios(){

@@ -27,6 +27,6 @@ public class VoluntarioController {
     @GetMapping("/{id}/programas")
     public ResponseEntity<List<ProgramaResponseDto>> getProgramaByVoluntarioId(@PathVariable Long id) {
         List<ProgramaResponseDto> programas = voluntarioService.getProgramaByVoluntarioId(id);
-        return ResponseEntity.ok(new ProgramaResponseDto());
+        return ResponseEntity.ok(programas);
     }
 }
