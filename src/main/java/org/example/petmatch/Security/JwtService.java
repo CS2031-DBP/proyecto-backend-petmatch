@@ -27,7 +27,7 @@ public class JwtService {
 
     public String generateToken(String email, String entityType) {
         Map<String, Object> claims = new HashMap<>();
-        claims.put("type", entityType); // "USER" o "ALBERGUE"
+        claims.put("type", entityType);
 
         return Jwts.builder()
                 .setClaims(claims)

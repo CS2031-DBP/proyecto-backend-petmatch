@@ -1,10 +1,8 @@
 package org.example.petmatch.Albergue.Domain;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import jakarta.validation.constraints.Email;
+import lombok.*;
 import org.example.petmatch.Animales.Domain.Animal;
 import org.example.petmatch.Post.Domain.Post;
 import org.example.petmatch.Programa_voluntariado.Domain.ProgramaVoluntariado;
@@ -18,6 +16,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "albergues")
+@Builder
 public class Albergue {
 
     @Id
@@ -26,6 +25,7 @@ public class Albergue {
 
     private String name;
 
+    @Column(nullable  = false)
     private String password;
 
     private String description;
@@ -38,6 +38,8 @@ public class Albergue {
 
     private Integer availableSpaces;
 
+    @Email
+    @Column(nullable = false, unique = true)
     private String email;
 
     @OneToMany(mappedBy = "albergue", cascade = CascadeType.ALL, orphanRemoval = true)

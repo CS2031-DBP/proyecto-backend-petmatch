@@ -7,6 +7,8 @@ import org.example.petmatch.User.Domain.Role;
 import org.example.petmatch.User.Dto.Request.UserLoginRequestDto;
 import org.example.petmatch.User.Dto.Request.UserRegisterRequestDto;
 import org.example.petmatch.User.Dto.Response.UserAuthResponseDto;
+import org.example.petmatch.User.Exceptions.InvalidCredentialsException;
+import org.example.petmatch.User.Exceptions.UserAlreadyExistsException;
 import org.example.petmatch.User.Infraestructure.UserRepository;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -26,7 +28,7 @@ public class UserService {
     @Transactional
     public UserAuthResponseDto registerUser(UserRegisterRequestDto request) {
         if (userRepository.existsByEmail(request.getEmail())) {
-            throw new IllegalArgumentException("Email ya registrado");
+            throw new UserAlreadyExistsException("El usuario con email " + request.getEmail() + " ya existe");
         }
 
         User user = modelMapper.map(request, User.class);
@@ -47,10 +49,10 @@ public class UserService {
     @Transactional(readOnly = true)
     public UserAuthResponseDto loginUser(UserLoginRequestDto request) {
         User user = userRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new IllegalArgumentException("Credenciales inválidas"));
+                .orElseThrow(() -> new InvalidCredentialsException("Credenciales inválidas"));
 
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
-            throw new IllegalArgumentException("Credenciales inválidas");
+            throw new InvalidCredentialsException("Credenciales inválidas");
         }
 
         String token = jwtService.generateToken(user.getEmail(), "USER");
