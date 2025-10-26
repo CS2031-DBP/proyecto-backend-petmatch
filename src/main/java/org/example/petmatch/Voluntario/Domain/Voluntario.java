@@ -36,10 +36,6 @@ public class Voluntario extends User {
         Inscripcion inscripcion = new Inscripcion(this, programa);
         inscripciones.add(inscripcion);
         programa.getInscritos().add(inscripcion);
-        programa.setNumeroVoluntariosInscritos(programa.getNumeroVoluntariosInscritos()+1);
-        if(programa.getNumeroVoluntariosInscritos() >= programa.getNumeroVoluntariosNecesarios()){
-            programa.setStatus(ProgramaStatus.LLENO);
-        }
     }
 
 

@@ -68,7 +68,7 @@ public class ProgramaService {
 
         ProgramaVoluntariado programa = programaRepository.findById(programaId)
                 .orElseThrow(() -> new ProgramaNotFoundException("Programa de voluntariado con id " + programaId + " no encontrado"));
-        if(!inscripcionRepository.existsByVoluntarioIdAndProgramaVoluntariadoId(voluntarioId, programaId)) {
+        if(inscripcionRepository.existsByVoluntarioIdAndProgramaVoluntariadoId(voluntarioId, programaId)) {
             throw new AlreadyEnrolledException("El voluntario con id " + voluntarioId + " ya está inscrito en el programa con id " + programaId);
         }
         if(programa.isLleno()){
@@ -128,7 +128,7 @@ public class ProgramaService {
         Voluntario voluntario = voluntarioRepository.findByEmail(username)
                 .orElseThrow(() -> new VoluntarioNotFoundException("Voluntario con email " + username + " no encontrado"));
 
-        if(inscripcionRepository.findByVoluntarioIdAndProgramaVoluntariadoId(programaId, voluntario.getId()).isEmpty()) {
+        if(inscripcionRepository.findByVoluntarioIdAndProgramaVoluntariadoId(voluntario.getId(), programaId).isEmpty()){
             throw new InscripcionNotFoundException("El voluntario con id " + voluntario.getId() + " no está inscrito en el programa con id " + programaId);
         }
 
@@ -155,7 +155,7 @@ public class ProgramaService {
 
     }
 
-    public void albergeDeletePrograma(Long id, String albergueEmail) {
+    public void albergueDeletePrograma(Long id, String albergueEmail) {
         ProgramaVoluntariado programa = programaRepository.findById(id)
                 .orElseThrow(() -> new ProgramaNotFoundException("Programa de voluntariado con id " + id + " no encontrado"));
 

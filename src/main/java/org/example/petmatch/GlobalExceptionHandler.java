@@ -3,7 +3,6 @@ package org.example.petmatch;
 import org.example.petmatch.Albergue.Exceptions.AlbergueAlreadyExistsException;
 import org.example.petmatch.Albergue.Exceptions.AlbergueNotFoundException;
 import org.example.petmatch.Exception.NotFoundException;
-import org.example.petmatch.Common.ValidationException;
 import org.example.petmatch.Inscripcion.exception.AlreadyEnrolledException;
 import org.example.petmatch.Inscripcion.exception.InscripcionNotFoundException;
 import org.example.petmatch.Programa_voluntariado.exception.ProgramaIsFullException;
@@ -25,12 +24,6 @@ import java.util.Map;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(ValidationException.class)
-    public ResponseEntity<String> handleValidationException(ValidationException ex) {
-        return ResponseEntity
-                .status(HttpStatus.BAD_REQUEST)
-                .body(ex.getMessage());
-    }
     @ExceptionHandler(NotFoundException.class)
     public ResponseEntity<String> handleNotFoundException(NotFoundException ex) {
         return ResponseEntity
