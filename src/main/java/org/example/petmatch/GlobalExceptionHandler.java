@@ -4,9 +4,14 @@ import org.example.petmatch.Albergue.Exceptions.AlbergueAlreadyExistsException;
 import org.example.petmatch.Albergue.Exceptions.AlbergueNotFoundException;
 import org.example.petmatch.Exception.NotFoundException;
 import org.example.petmatch.Common.ValidationException;
+import org.example.petmatch.Inscripcion.exception.AlreadyEnrolledException;
+import org.example.petmatch.Inscripcion.exception.InscripcionNotFoundException;
+import org.example.petmatch.Programa_voluntariado.exception.ProgramaIsFullException;
+import org.example.petmatch.Programa_voluntariado.exception.ProgramaNotFoundException;
 import org.example.petmatch.User.Exceptions.InvalidCredentialsException;
 import org.example.petmatch.User.Exceptions.UserAlreadyExistsException;
 import org.example.petmatch.User.Exceptions.UserNotFoundException;
+import org.example.petmatch.Voluntario.exception.VoluntarioNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -63,6 +68,36 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Map<String, Object>> handleAlbergueNotFoundException(
             AlbergueNotFoundException ex) {
         return buildErrorResponse(HttpStatus.NOT_FOUND, "Albergue no encontardo", ex.getMessage());
+    }
+
+    @ExceptionHandler(AlreadyEnrolledException.class)
+    public ResponseEntity<Map<String, Object>> handleAlreadyEnrolledException(
+            AlreadyEnrolledException ex) {
+        return buildErrorResponse(HttpStatus.CONFLICT, "El usuario ya se encuentra inscripto en el programa", ex.getMessage());
+    }
+
+    @ExceptionHandler(InscripcionNotFoundException.class)
+    public ResponseEntity<Map<String, Object>> handleInscripcionNotFoundException(
+            InscripcionNotFoundException ex) {
+        return buildErrorResponse(HttpStatus.NOT_FOUND, "Inscripcion no encontrada", ex.getMessage());
+    }
+
+    @ExceptionHandler(ProgramaIsFullException.class)
+    public ResponseEntity<Map<String, Object>> handleProgramaIsFullException(
+            ProgramaIsFullException ex) {
+        return buildErrorResponse(HttpStatus.BAD_REQUEST, "El programa ya ha alcanzado el número máximo de voluntarios", ex.getMessage());
+    }
+
+    @ExceptionHandler(ProgramaNotFoundException.class)
+    public ResponseEntity<Map<String, Object>> handleProgramaNotFoundException(
+            ProgramaNotFoundException ex) {
+        return buildErrorResponse(HttpStatus.NOT_FOUND, "Programa no encontrado", ex.getMessage());
+    }
+
+    @ExceptionHandler(VoluntarioNotFoundException.class)
+    public ResponseEntity<Map<String, Object>> handleVoluntarioNotFoundException(
+            VoluntarioNotFoundException ex) {
+        return buildErrorResponse(HttpStatus.NOT_FOUND, "Voluntario no encontrado", ex.getMessage());
     }
 
     private ResponseEntity<Map<String, Object>> buildErrorResponse(HttpStatus status, String error, String message) {

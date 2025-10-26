@@ -11,4 +11,5 @@ import java.util.Optional;
 @Transactional
 public interface VoluntarioRepository extends JpaRepository<Voluntario, Long> {
     Optional<Voluntario> findById(Long id);
+    Optional<Voluntario> findByEmail(String email);
 }

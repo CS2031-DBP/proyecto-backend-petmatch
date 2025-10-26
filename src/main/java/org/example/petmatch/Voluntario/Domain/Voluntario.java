@@ -7,6 +7,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import org.example.petmatch.Inscripcion.domain.Inscripcion;
+import org.example.petmatch.Programa_voluntariado.Domain.ProgramaStatus;
 import org.example.petmatch.Programa_voluntariado.Domain.ProgramaVoluntariado;
 import org.example.petmatch.User.Domain.User;
 
@@ -35,7 +36,12 @@ public class Voluntario extends User {
         Inscripcion inscripcion = new Inscripcion(this, programa);
         inscripciones.add(inscripcion);
         programa.getInscritos().add(inscripcion);
+        programa.setNumeroVoluntariosInscritos(programa.getNumeroVoluntariosInscritos()+1);
+        if(programa.getNumeroVoluntariosInscritos() >= programa.getNumeroVoluntariosNecesarios()){
+            programa.setStatus(ProgramaStatus.LLENO);
+        }
     }
+
 
     public void removeInscripcion(ProgramaVoluntariado programa){
         for(Inscripcion inscripcion : inscripciones){
@@ -46,6 +52,13 @@ public class Voluntario extends User {
                 inscripcion.setProgramaVoluntariado(null);
                 break;
             }
+        }
+        if (programa.getNumeroVoluntariosInscritos() > 0) {
+            programa.setNumeroVoluntariosInscritos(programa.getNumeroVoluntariosInscritos() - 1);
+        }
+        if(programa.getStatus() == ProgramaStatus.LLENO &&
+                programa.getNumeroVoluntariosInscritos() < programa.getNumeroVoluntariosNecesarios()){
+            programa.setStatus(ProgramaStatus.ABIERTO);
         }
     }
 
