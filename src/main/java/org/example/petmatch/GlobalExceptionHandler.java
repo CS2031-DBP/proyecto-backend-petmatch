@@ -2,6 +2,7 @@ package org.example.petmatch;
 
 import org.example.petmatch.Albergue.Exceptions.AlbergueAlreadyExistsException;
 import org.example.petmatch.Albergue.Exceptions.AlbergueNotFoundException;
+import org.example.petmatch.Albergue.Exceptions.ValidationException;
 import org.example.petmatch.Exception.NotFoundException;
 import org.example.petmatch.Inscripcion.exception.AlreadyEnrolledException;
 import org.example.petmatch.Inscripcion.exception.InscripcionNotFoundException;
@@ -30,6 +31,12 @@ public class GlobalExceptionHandler {
                 .status(HttpStatus.NOT_FOUND)
                 .body(ex.getMessage());
     }
+
+    @ExceptionHandler(ValidationException.class)
+    public ResponseEntity<Map<String, Object>> handleValidationException(ValidationException ex) {
+        return buildErrorResponse(HttpStatus.BAD_REQUEST, "Solicitud no valida", ex.getMessage());
+    }
+
 
     @ExceptionHandler(InvalidCredentialsException.class)
     public ResponseEntity<Map<String, Object>> handleInvalidCredentialsException(InvalidCredentialsException ex) {

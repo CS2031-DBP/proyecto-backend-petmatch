@@ -62,14 +62,6 @@ public class AlbergueController {
         return ResponseEntity.ok(nearby);
     }
 
-    /*
-    @PostMapping("/nuevo")
-    @PreAuthorize("permitAll()")
-    public ResponseEntity<NewIdDTO> createAlbergue(@Valid @RequestBody AlbergueRegisterDTO albergue) throws Exception {
-        Albergue albergueEntity = albergueService.newAlbergue(albergue);
-        return ResponseEntity.status(HttpStatus.CREATED).body(new NewIdDTO(albergueEntity.getId()));
-    }
-     */
 
     @DeleteMapping("/{name}")
     @PreAuthorize("hasRole('ALBERGUE')")
