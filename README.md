@@ -40,9 +40,9 @@ En el Perú, el abandono y la falta de control poblacional de animales doméstic
 
 Esta cifra evidencia una gran cantidad de animales sin hogar, pero también un potencial espacio para la adopción responsable que aún no ha sido plenamente aprovechado.
 
-Ante esta realidad, numerosos albergues, refugios y organizaciones de rescate han surgido con la misión de brindar refugio, atención médica y una nueva oportunidad de vida a estos animales.  
-Sin embargo, la mayoría de estos espacios opera de manera independiente y con recursos limitados, lo que dificulta la coordinación, el registro de animales y la difusión de sus actividades.  
-Además, no existe una base de datos nacional o regional que centralice información sobre los animales en abandono ni sobre los albergues que los acogen, lo que complica la planificación y la colaboración interinstitucional.
+Ante esta realidad, numerosos albergues, refugios y organizaciones de rescate han surgido con la misión de brindar refugio, atención médica y una nueva oportunidad de vida a estos animales. 
+
+Sin embargo, la mayoría de estos espacios opera de manera independiente y con recursos limitados, lo que dificulta la coordinación, el registro de animales y la difusión de sus actividades. Además, no existe una base de datos nacional o regional que centralice información sobre los animales en abandono ni sobre los albergues que los acogen, lo que complica la planificación y la colaboración interinstitucional.
 
 En este contexto, **PetMatch** surge como una iniciativa que busca implementar un registro digital local de albergues y animales en adopción, con miras a una futura expansión nacional.
 
@@ -69,8 +69,7 @@ A pesar de la labor constante de los albergues y organizaciones de rescate anima
 
 La fragmentación en la gestión y comunicación entre los distintos actores involucrados (albergues, voluntarios, adoptantes y entidades públicas) limita la eficiencia en las campañas de adopción y dificulta la identificación de las zonas con mayor necesidad de atención.
 
-Asimismo, muchos albergues siguen gestionando manualmente sus registros, lo que se traduce en un trabajo extra con muchas imprecisiones; en consecuencia, se desaprovechan oportunidades de colaboración.  
-Por otro lado, las personas interesadas en adoptar o donar carecen de un canal confiable y accesible que les permita encontrar información actualizada sobre los animales disponibles o las necesidades específicas de cada refugio.
+Asimismo, muchos albergues siguen gestionando manualmente sus registros, lo que se traduce en un trabajo extra con muchas imprecisiones; en consecuencia, se desaprovechan oportunidades de colaboración. Por otro lado, las personas interesadas en adoptar o donar carecen de un canal confiable y accesible que les permita encontrar información actualizada sobre los animales disponibles o las necesidades específicas de cada refugio.
 
 En conjunto, estos factores reflejan un problema estructural de desconexión y desorganización digital en torno al bienestar animal en el país, que requiere una solución tecnológica sostenible, escalable y centrada en las comunidades locales.
 
@@ -192,5 +191,107 @@ Representa a los animales bajo cuidado o disponibles para adopción.
 * `shelter`: relación *muchos a uno* con `Shelter`.
 
 Esta entidad es clave para registrar y gestionar la información de cada animal dentro del sistema.
+
+---
+
+## **5. Testing y Manejo de Errores**
+
+---
+
+## **6. Medidas de Seguridad Implementadas**
+
+La seguridad de **PetMatch** se basa en el uso de **Spring Security** y **JWT (JSON Web Tokens)** para garantizar una autenticación robusta, separación de roles y protección de rutas sensibles. A continuación, se detallan los principales componentes y mecanismos aplicados.
+
+### **6.1. Autenticación y Autorización**
+
+El sistema implementa un flujo **stateless** (sin sesiones en servidor) basado en tokens JWT.
+Cada vez que un usuario o albergue inicia sesión correctamente, se genera un token firmado que contiene:
+
+* El correo electrónico del usuario (subject).
+* El tipo de entidad (`USER` o `ALBERGUE`).
+* Una fecha de expiración configurable.
+
+Este token debe enviarse en el encabezado HTTP `Authorization: Bearer <token>` en cada petición posterior.
+
+### **6.2. Generación y Validación del Token**
+
+El servicio `JwtService` es el encargado de manejar los procesos de emisión y verificación de tokens.
+Utiliza una **clave secreta HMAC-SHA256** almacenada en el archivo de configuración (`application.properties`) y un tiempo de expiración definido por variable de entorno (`jwt.expiration`).
+
+**Características clave:**
+
+* Método `generateToken()` → genera el token con los *claims* de tipo y correo.
+* Método `isTokenValid()` → verifica su validez temporal y firma.
+* Método `extractEntityType()` → diferencia entre usuarios y albergues autenticados.
+
+### **6.3. Filtro de Autorización**
+
+El componente `JwtAuthorizationFilter` intercepta cada solicitud HTTP antes de llegar al controlador.
+Sus principales tareas son:
+
+1. Extraer el token del encabezado `Authorization`.
+2. Validar su autenticidad mediante `JwtService`.
+3. Determinar el tipo de entidad (`USER` o `ALBERGUE`).
+4. Cargar los detalles de la entidad correspondiente desde la base de datos (a través de `UserDetailsServiceImpl` o `AlbeguerDetailsServiceImpl`).
+5. Configurar el contexto de seguridad (`SecurityContextHolder`) con las credenciales válidas.
+
+Esto garantiza que solo las peticiones con tokens válidos puedan acceder a rutas protegidas.
+
+### **6.4. Configuración de Roles y Rutas Protegidas**
+
+El archivo `SecurityConfig` define las políticas de acceso para cada endpoint.
+El sistema diferencia claramente entre **rutas públicas** y **rutas restringidas**:
+
+**Rutas públicas**
+
+* `/user/auth/**` → registro e inicio de sesión de usuarios.
+* `/albergues/auth/**` → registro e inicio de sesión de albergues.
+* `/albergues`, `/albergues/near` → consulta de refugios sin autenticación.
+* `/voluntarios`, `/voluntarios/{id}/programas` → acceso libre a programas de voluntariado.
+
+**Rutas protegidas**
+
+* `/user/**` → requiere autenticación con rol `ROLE_USER`.
+* `/albergues/**` → requiere autenticación con rol `ROLE_ALBERGUE`.
+
+Cualquier otra ruta requiere autenticación por defecto.
+El manejo de sesiones se establece como **STATELESS**, reforzando la seguridad del modelo JWT.
+
+### **6.5. Encriptación de Contraseñas**
+
+Las contraseñas se almacenan utilizando el algoritmo **BCrypt**, implementado mediante el `PasswordEncoder` de Spring Security.
+Este mecanismo añade un *salt* aleatorio en cada hash, lo que evita ataques de tipo *rainbow table* y mejora la integridad de las credenciales.
+
+### **6.6. Separación de Servicios de Autenticación**
+
+Para garantizar un control granular y seguro, se implementaron dos servicios distintos que extienden `UserDetailsService`:
+
+* **`UserDetailsServiceImpl`** → gestiona la autenticación de usuarios comunes.
+* **`AlbeguerDetailsServiceImpl`** → gestiona la autenticación de albergues.
+
+Esta separación permite una gestión más clara de roles, permisos y validación de credenciales en función del tipo de entidad que accede al sistema.
+
+---
+## **7. Eventos y Asincronía**
+
+---
+
+## **8. Conclusión**
+
+---
+
+## **9. Apéndices**
+
+### **9.1. Licencia**
+
+**MIT License**
+
+### **9.2. Referencias**
+
+* Briceño, E. (2024). Más de 7 millones de perros y gatos abandonados y la oportunidad de volver a casa. _Convive_.
+  [https://convoca.pe/convive/mas-de-7-millones-de-perros-y-gatos-abandonados-y-la-oportunidad-de-volver-casa](https://convoca.pe/convive/mas-de-7-millones-de-perros-y-gatos-abandonados-y-la-oportunidad-de-volver-casa)
+
+* Medrano, H. (14 de mayo de 2023). Perros y gatos sin hogar en Lima: ¿Existe un registro de animales en situación de abandono? ¿Qué se sabe de la Ley 4 patas?. _El Comercio_.
+  [https://elcomercio.pe/lima/sucesos/perros-y-gatos-sin-hogar-en-lima-existe-un-registro-de-animales-en-situacion-de-abandono-que-se-sabe-de-la-ley-4-patas-adopcion-responsable-esterilizacion-albergues-rescatistas-noticia/?ref=ecr](https://elcomercio.pe/lima/sucesos/perros-y-gatos-sin-hogar-en-lima-existe-un-registro-de-animales-en-situacion-de-abandono-que-se-sabe-de-la-ley-4-patas-adopcion-responsable-esterilizacion-albergues-rescatistas-noticia/?ref=ecr)
 
 ---
