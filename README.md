@@ -129,6 +129,7 @@ Entre las principales funcionalidades se incluyen:
 ## **4. Modelo de Entidades**
 
 ### **4.1 Diagrama de Entidad-Relación (E-R)**
+Imagen adjunta entre los files (entidadrelacion.jpg).
 
 ### **4.2 Descripción de Entidades**
 Entre las entidades principales del sistema se encuentran: **Shelter**, **User**, **VolunteerProgram** y **Animal**.
