@@ -41,7 +41,7 @@ public class UserController {
     }
 
     @PostMapping("/report")
-    public ResponseEntity<AnimalPresentationDTO> createReport(@RequestBody AnimalReportDTO instanceAnimal) throws ValidationException {
+    public ResponseEntity<AnimalPresentationDTO> createReport(@RequestBody AnimalReportDTO instanceAnimal) throws ValidationException, org.example.petmatch.Exception.ValidationException {
         AnimalPresentationDTO reportDTO = animalService.createReport(instanceAnimal);
         return ResponseEntity.status(HttpStatus.CREATED).body(reportDTO);
     }

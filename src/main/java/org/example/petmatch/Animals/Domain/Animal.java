@@ -31,4 +31,5 @@ public class Animal {
     @JoinColumn(name = "shelter_id")
     private Shelter shelter;
 
+
 }
