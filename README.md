@@ -117,46 +117,80 @@ Entre las principales funcionalidades se incluyen:
 ### **4.1 Diagrama de Entidad-Relación (E-R)**
 
 ### **4.2 Descripción de Entidades**
+Entre las entidades principales del sistema se encuentran: **Shelter**, **User**, **VolunteerProgram** y **Animal**.
 
-#### **4.2.1 Albergue**
-Representa los refugios o instituciones que acogen animales.  
+#### **4.2.1 Shelter**
+Representa a los albergues registrados dentro de la plataforma. Cada refugio gestiona animales, publicaciones y programas de voluntariado.
+
 **Atributos:**
-- `name`: nombre oficial del albergue  
-- `address`: dirección física  
-- `phone`: número de contacto  
-- `capacity`: capacidad máxima  
-- `availableSpaces`: espacios disponibles  
+* `name`
+* `password`
+* `description`
+* `latitude`, `longitude`
+* `address`
+* `phone`
+* `capacity`
+* `availableSpaces`
+* `email`
+* `rating`
 
-Relaciones:
-- `One-to-Many` con **Post** y **ProgramaVoluntariado**
+**Relaciones:**
+
+* `posts`: relación *uno a muchos* con `Post`.
+* `volunteerPrograms`: relación *uno a muchos* con `VolunteerProgram`.
+* `animals`: relación *uno a muchos* con `Animal`.
+* `followers`: relación *muchos a muchos* con `User`.
 
 #### **4.2.2 User**
-Representa a toda persona registrada en el sistema.  
+Representa a toda persona registrada en el sistema, incluyendo adoptantes, donantes, voluntarios o administradores.
+
 **Atributos:**
-- `name`, `lastname`  
-- `email`  
-- `password`  
+* `name`, `lastname`
+* `email`
+* `password`
+* `role`
 
-Usa herencia `@Inheritance(strategy = InheritanceType.JOINED)` para permitir subclases (Voluntario, Administrador, etc.).
+**Relaciones:**
 
-#### **4.2.3 Animal**
-Representa a los animales bajo cuidado o disponibles para adopción.  
+* `comments`: relación *uno a muchos* con `Comments`.
+* Puede seguir a varios refugios (`Shelter`) mediante una relación *many to many*.
+
+Usa herencia con
+`@Inheritance(strategy = InheritanceType.JOINED)`
+para permitir la extensión hacia subclases especializadas (por ejemplo, `Volunteer` o `Admin`).
+
+#### **4.2.3 VolunteerProgram**
+Representa los programas de voluntariado organizados por los albergues para apoyar a los animales.
+
 **Atributos:**
-- `registered`: booleano de registro  
-- `name`: nombre  
-- `breed`: raza  
+* `name`
+* `description`
+* `startDate`, `finishDate`
+* `location`
+* `necessaryVolunteers`
+* `enrolledVolunteers`
+* `status`
 
-Relación:
-- `Many-to-One` con **Albergue**
+**Relaciones:**
 
-#### **4.2.4 Programa de Voluntariado**
-Permite organizar actividades y campañas.  
+* `shelter`: relación *muchos a uno* con `Shelter`.
+* `enrolled`: relación *uno a muchos* con `Inscription`.
+
+Permite administrar las inscripciones y el estado del programa (por ejemplo, activo o lleno).
+
+#### **4.2.4 Animal**
+Representa a los animales bajo cuidado o disponibles para adopción.
+
 **Atributos:**
-- `id`: identificador único  
-- `albergue`: referencia al albergue creador  
+* `registered`
+* `name`
+* `breed`
+* `image`
 
-Relación:
-- `Many-to-One` con **Albergue**
+**Relaciones:**
+
+* `shelter`: relación *muchos a uno* con `Shelter`.
+
+Esta entidad es clave para registrar y gestionar la información de cada animal dentro del sistema.
 
 ---
-
