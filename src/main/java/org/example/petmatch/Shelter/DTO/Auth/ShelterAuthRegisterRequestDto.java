@@ -18,6 +18,12 @@ public class ShelterAuthRegisterRequestDto {
     @NotBlank(message = "ERROR: Debe ingresar una dirección")
     private String address;
 
+    @NotNull(message = "ERROR: Debe ingresar la longitud")
+    private Double longitude;
+
+    @NotNull(message = "ERROR: Debe ingresar la latitud")
+    private Double latitude;
+
     @NotNull(message = "ERROR: Debe ingresar un teléfono")
     private Long phone;
 
