@@ -1,5 +1,8 @@
 # **PetMatch: Integración y apoyo en albergues para ayudar a los animales**
 **Curso:** Desarrollo Basado en Plataformas (CS 2031)  
+
+**Postman Collection:** [PostmanCollection](https://asd555-8170.postman.co/workspace/petmatch~a8e471f9-ed4f-4af2-aa04-8d6e9a733429/collection/43516792-bcb6e32d-31db-4ce8-aaa0-d2df52bfdbc0?action=share&creator=43516792&active-environment=43516792-ecbff733-47ce-4eb0-bbb8-2cf1f6e8cd2b)
+
 **Integrantes:**  
 - Valentín Tuesta Barrantes - 202410251  
 - Rayhan Matos Copello - 202410377  
