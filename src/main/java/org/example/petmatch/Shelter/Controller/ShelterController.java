@@ -9,7 +9,6 @@ import org.example.petmatch.Shelter.DTO.Auth.ShelterAuthRegisterRequestDto;
 import org.example.petmatch.Shelter.Domain.Shelter;
 import org.example.petmatch.Shelter.Domain.ShelterService;
 import org.example.petmatch.Shelter.Exceptions.ValidationException;
-import org.example.petmatch.GoogleApi.GoogleMapsService;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,7 +24,6 @@ public class ShelterController {
 
     private final ShelterService shelterService;
 
-    private final GoogleMapsService googleMapsService;
 
     private final ModelMapper modelMapper;
 
@@ -36,28 +34,12 @@ public class ShelterController {
         return ResponseEntity.ok(alberguedtos);
     }
 
-    @GetMapping("/near")
-    public ResponseEntity<List<ShelterPresentationDTO>> getAlberguesNear(
-            @RequestParam String location,
-            @RequestParam(defaultValue = "5") double radiusKm) throws Exception {
+    @GetMapping("/near/{latitude}/{longitude}")
+    public ResponseEntity<List<ShelterPresentationDTO>> getAlberguesNear(@PathVariable Double latitude,
+                                                                         @PathVariable Double longitude) throws Exception {
+        List<ShelterPresentationDTO> alberguedtos = shelterService.findSheltersNear(latitude, longitude);
 
-        List<ShelterPresentationDTO> all = shelterService.findAll();
-        var origin = googleMapsService.getCoordinates(location);
-
-        List<ShelterPresentationDTO> nearby = all.stream()
-                .filter(a -> {
-                    try {
-                        if (a.getAddress() == null) return false;
-                        var coords = googleMapsService.getCoordinates(a.getAddress());
-                        return googleMapsService.distanceKm(origin, coords) <= radiusKm;
-                    } catch (Exception e) {
-                        return false;
-                    }
-                })
-                .map(a -> modelMapper.map(a, ShelterPresentationDTO.class))
-                .toList();
-
-        return ResponseEntity.ok(nearby);
+        return ResponseEntity.ok(alberguedtos);
     }
 
 

@@ -9,7 +9,6 @@ import org.example.petmatch.Shelter.Exceptions.ShelterNotFoundException;
 import org.example.petmatch.Shelter.Infraestructure.ShelterRepository;
 import lombok.RequiredArgsConstructor;
 import org.example.petmatch.Shelter.Exceptions.ValidationException;
-import org.example.petmatch.GoogleApi.GoogleMapsService;
 import org.example.petmatch.Security.JwtService;
 import org.example.petmatch.User.Exceptions.InvalidCredentialsException;
 import org.modelmapper.ModelMapper;
@@ -24,11 +23,22 @@ import java.util.regex.Pattern;
 @RequiredArgsConstructor
 public class ShelterService {
 
-    private final GoogleMapsService googleMapsService;
     private final ShelterRepository shelterRepository;
     private final ModelMapper modelMapper;
     private final JwtService jwtService;
     private final PasswordEncoder passwordEncoder;
+    private static final double EARTH_RADIUS_KM = 6371.0088;
+    private static double haversineKm(double lat1, double lon1, double lat2, double lon2) {
+        double dLat = Math.toRadians(lat2 - lat1);
+        double dLon = Math.toRadians(lon2 - lon1);
+
+        double a = Math.sin(dLat / 2) * Math.sin(dLat / 2)
+                + Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2))
+                * Math.sin(dLon / 2) * Math.sin(dLon / 2);
+
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        return EARTH_RADIUS_KM * c;
+    }
 
     public List<ShelterPresentationDTO> findAll(){
         return shelterRepository.findAll().stream().map(albergue -> modelMapper.map(albergue, ShelterPresentationDTO.class))
@@ -62,9 +72,6 @@ public class ShelterService {
 
     public Shelter updateAddress(String newAddress, String albergue_name) throws Exception {
         Shelter shelter = shelterRepository.findByName(albergue_name).orElseThrow(() -> new ShelterNotFoundException("No existe un albergue con ese nombre"));
-        if (!googleMapsService.isValidAddress(newAddress)) {
-            throw new ValidationException("La dirección proporcionada no es válida o no existe en Google Maps.");
-        }
 
         shelter.setAddress(newAddress);
         return shelterRepository.save(shelter);
@@ -131,4 +138,26 @@ public class ShelterService {
         return response;
     }
 
+    public List<ShelterPresentationDTO> findSheltersNear(Double latitude, Double longitude) throws Exception {
+        if (latitude == null || longitude == null) {
+            throw new ValidationException("La latitud y la longitud son obligatorias");
+        }
+        List<ShelterPresentationDTO> nearShelters = new java.util.ArrayList<>();
+        final double RADIUS_KM = 6.0;
+
+        for (Shelter shelter : shelterRepository.findAll()){
+            if (shelter.getLatitude() != null && shelter.getLongitude() != null) {
+                Double lat2 = shelter.getLatitude();
+                Double lon2 = shelter.getLongitude();
+                if (lat2 == null || lon2 == null) continue;
+
+                double dKm = haversineKm(latitude, longitude, lat2, lon2);
+                if (dKm <= RADIUS_KM) {
+                    ShelterPresentationDTO dto = modelMapper.map(shelter, ShelterPresentationDTO.class);
+                    nearShelters.add(dto);
+                }
+            }
+        }
+        return nearShelters;
+    }
 }

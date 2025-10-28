@@ -30,7 +30,12 @@ public class Shelter {
 
     private String description;
 
+    private Double latitude;
+
+    private Double longitude;
+
     private String address;
+
 
     private Long phone;
 
