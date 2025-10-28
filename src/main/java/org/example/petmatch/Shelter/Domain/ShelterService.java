@@ -1,5 +1,6 @@
 package org.example.petmatch.Shelter.Domain;
 
+import org.example.petmatch.Email.EmailService;
 import org.example.petmatch.Shelter.DTO.Auth.ShelterAuthLoginRequestDto;
 import org.example.petmatch.Shelter.DTO.Auth.ShelterAuthResponseDto;
 import org.example.petmatch.Shelter.DTO.Auth.ShelterAuthRegisterRequestDto;
@@ -28,6 +29,9 @@ public class ShelterService {
     private final JwtService jwtService;
     private final PasswordEncoder passwordEncoder;
     private static final double EARTH_RADIUS_KM = 6371.0088;
+    private final EmailService emailService;
+
+
     private static double haversineKm(double lat1, double lon1, double lat2, double lon2) {
         double dLat = Math.toRadians(lat2 - lat1);
         double dLon = Math.toRadians(lon2 - lon1);
@@ -112,6 +116,8 @@ public class ShelterService {
         shelterRepository.save(shelter);
 
         String token = jwtService.generateToken(shelter.getEmail(), "ALBERGUE");
+
+        emailService.sendWelcomeEmailAlbergue(shelter.getEmail(), shelter.getName());
 
         ShelterAuthResponseDto responseDto = modelMapper.map(shelter, ShelterAuthResponseDto.class);
         responseDto.setRating(shelter.getRating().name());

@@ -1,6 +1,7 @@
 package org.example.petmatch.User.Service;
 
 
+import org.example.petmatch.Email.EmailService;
 import org.example.petmatch.Security.JwtService;
 import org.example.petmatch.User.Domain.User;
 import org.example.petmatch.User.Domain.Role;
@@ -24,6 +25,7 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final ModelMapper modelMapper;
+    private final EmailService emailService;
 
     @Transactional
     public UserAuthResponseDto registerUser(UserRegisterRequestDto request) {
@@ -38,6 +40,8 @@ public class UserService {
         userRepository.save(user);
 
         String token = jwtService.generateToken(user.getEmail(), "USER");
+
+        emailService.sendWelcomeEmailUser(user.getEmail(), user.getName());
 
         UserAuthResponseDto responseDto = modelMapper.map(user,UserAuthResponseDto.class);
         responseDto.setRole(user.getRole().toString());
