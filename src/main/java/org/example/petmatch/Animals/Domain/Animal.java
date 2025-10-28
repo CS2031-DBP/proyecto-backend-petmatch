@@ -25,6 +25,8 @@ public class Animal {
 
     private String breed;
 
+    private String image;
+
     @ManyToOne
     @JoinColumn(name = "shelter_id")
     private Shelter shelter;

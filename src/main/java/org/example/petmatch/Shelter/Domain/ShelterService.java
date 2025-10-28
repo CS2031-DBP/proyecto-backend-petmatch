@@ -8,7 +8,7 @@ import org.example.petmatch.Shelter.Exceptions.ShelterAlreadyExistsException;
 import org.example.petmatch.Shelter.Exceptions.ShelterNotFoundException;
 import org.example.petmatch.Shelter.Infraestructure.ShelterRepository;
 import lombok.RequiredArgsConstructor;
-import org.example.petmatch.Shelter.Exceptions.ValidationException;
+import org.example.petmatch.Exception.ValidationException;
 import org.example.petmatch.Security.JwtService;
 import org.example.petmatch.User.Exceptions.InvalidCredentialsException;
 import org.modelmapper.ModelMapper;

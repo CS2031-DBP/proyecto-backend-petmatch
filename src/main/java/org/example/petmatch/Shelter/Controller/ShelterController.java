@@ -8,7 +8,7 @@ import org.example.petmatch.Shelter.DTO.Auth.ShelterAuthLoginRequestDto;
 import org.example.petmatch.Shelter.DTO.Auth.ShelterAuthRegisterRequestDto;
 import org.example.petmatch.Shelter.Domain.Shelter;
 import org.example.petmatch.Shelter.Domain.ShelterService;
-import org.example.petmatch.Shelter.Exceptions.ValidationException;
+import org.example.petmatch.Exception.ValidationException;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

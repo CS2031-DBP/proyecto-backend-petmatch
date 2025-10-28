@@ -3,7 +3,7 @@ package org.example.petmatch.Post.Domain;
 import lombok.RequiredArgsConstructor;
 import org.example.petmatch.Shelter.Domain.Shelter;
 import org.example.petmatch.Shelter.Infraestructure.ShelterRepository;
-import org.example.petmatch.Shelter.Exceptions.ValidationException;
+import org.example.petmatch.Exception.ValidationException;
 import org.example.petmatch.Exception.NotFoundException;
 import org.example.petmatch.Post.DTO.PostViewDTO;
 import org.example.petmatch.Post.DTO.RequestPostDTO;

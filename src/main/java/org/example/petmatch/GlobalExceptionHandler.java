@@ -2,7 +2,7 @@ package org.example.petmatch;
 
 import org.example.petmatch.Shelter.Exceptions.ShelterAlreadyExistsException;
 import org.example.petmatch.Shelter.Exceptions.ShelterNotFoundException;
-import org.example.petmatch.Shelter.Exceptions.ValidationException;
+import org.example.petmatch.Exception.ValidationException;
 import org.example.petmatch.Exception.NotFoundException;
 import org.example.petmatch.Inscription.exception.AlreadyEnrolledException;
 import org.example.petmatch.Inscription.exception.InscriptionNotFoundException;
