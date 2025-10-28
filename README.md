@@ -6,27 +6,60 @@
 - Daniela Valentina Villacorta Sotelo - 202410253  
 - Emma Anderson Gonzalez - 202410607  
 - Juan Marcelo Ferreyra Gonzales - 202410166  
-
 ---
 
 ## **Índice**
-1. Introducción  
-   1.1 Contexto  
-   1.2 Objetivos del Proyecto  
-2. Identificación del Problema o Necesidad  
-   2.1 Descripción del Problema  
-   2.2 Justificación  
-3. Descripción de la Solución  
-   3.1 Funcionalidades Implementadas  
-   3.2 Tecnologías Utilizadas  
-4. Modelo de Entidades  
-   4.1 Diagrama E-R  
-   4.2 Descripción de Entidades  
-5. Testing y Manejo de Errores  
-6. Medidas de Seguridad Implementadas  
-7. Conclusiones  
-8. Apéndices  
 
+1. **Introducción**
+
+   * 1.1 Contexto
+   * 1.2 Objetivos del Proyecto
+
+2. **Identificación del Problema o Necesidad**
+
+   * 2.1 Descripción del Problema
+   * 2.2 Justificación
+
+3. **Descripción de la Solución**
+
+   * 3.1 Funcionalidades Implementadas
+   * 3.2 Tecnologías Utilizadas
+
+4. **Modelo de Entidades**
+
+   * 4.1 Diagrama de Entidad-Relación (E-R)
+   * 4.2 Descripción de Entidades
+
+     * 4.2.1 Shelter
+     * 4.2.2 User
+     * 4.2.3 VolunteerProgram
+     * 4.2.4 Animal
+
+5. **Testing y Manejo de Errores**
+
+   * 5.1 Niveles de Testing Realizados
+   * 5.2 Resultados
+   * 5.3 Manejo de Errores
+
+6. **Medidas de Seguridad Implementadas**
+
+   * 6.1 Autenticación y Autorización
+   * 6.2 Generación y Validación del Token
+   * 6.3 Filtro de Autorización
+   * 6.4 Configuración de Roles y Rutas Protegidas
+   * 6.5 Encriptación de Contraseñas
+   * 6.6 Separación de Servicios de Autenticación
+
+7. **Conclusión**
+
+   * 7.1 Logros del Proyecto
+   * 7.2 Aprendizajes Clave
+   * 7.3 Trabajo Futuro
+
+8. **Apéndices**
+
+   * 8.1 Licencia
+   * 8.2 Referencias
 ---
 
 ## **1. Introducción**
@@ -195,7 +228,7 @@ Esta entidad es clave para registrar y gestionar la información de cada animal 
 
 ## **5. Testing y Manejo de Errores**
 
-### **5.1. Niveles de Testing Realizados**
+### **5.1 Niveles de Testing Realizados**
 
 Durante el desarrollo del sistema se implementaron diferentes niveles de prueba para asegurar la **calidad y estabilidad del software**:
 
@@ -245,7 +278,7 @@ El manejo centralizado de excepciones permite ofrecer mensajes **claros y consis
 
 La seguridad de **PetMatch** se basa en el uso de **Spring Security** y **JWT (JSON Web Tokens)** para garantizar una autenticación robusta, separación de roles y protección de rutas sensibles. A continuación, se detallan los principales componentes y mecanismos aplicados.
 
-### **6.1. Autenticación y Autorización**
+### **6.1 Autenticación y Autorización**
 
 El sistema implementa un flujo **stateless** (sin sesiones en servidor) basado en tokens JWT.
 Cada vez que un usuario o albergue inicia sesión correctamente, se genera un token firmado que contiene:
@@ -256,7 +289,7 @@ Cada vez que un usuario o albergue inicia sesión correctamente, se genera un to
 
 Este token debe enviarse en el encabezado HTTP `Authorization: Bearer <token>` en cada petición posterior.
 
-### **6.2. Generación y Validación del Token**
+### **6.2 Generación y Validación del Token**
 
 El servicio `JwtService` es el encargado de manejar los procesos de emisión y verificación de tokens.
 Utiliza una **clave secreta HMAC-SHA256** almacenada en el archivo de configuración (`application.properties`) y un tiempo de expiración definido por variable de entorno (`jwt.expiration`).
@@ -267,7 +300,7 @@ Utiliza una **clave secreta HMAC-SHA256** almacenada en el archivo de configurac
 * Método `isTokenValid()` → verifica su validez temporal y firma.
 * Método `extractEntityType()` → diferencia entre usuarios y albergues autenticados.
 
-### **6.3. Filtro de Autorización**
+### **6.3 Filtro de Autorización**
 
 El componente `JwtAuthorizationFilter` intercepta cada solicitud HTTP antes de llegar al controlador.
 Sus principales tareas son:
@@ -300,12 +333,12 @@ El sistema diferencia claramente entre **rutas públicas** y **rutas restringida
 Cualquier otra ruta requiere autenticación por defecto.
 El manejo de sesiones se establece como **STATELESS**, reforzando la seguridad del modelo JWT.
 
-### **6.5. Encriptación de Contraseñas**
+### **6.5 Encriptación de Contraseñas**
 
 Las contraseñas se almacenan utilizando el algoritmo **BCrypt**, implementado mediante el `PasswordEncoder` de Spring Security.
 Este mecanismo añade un *salt* aleatorio en cada hash, lo que evita ataques de tipo *rainbow table* y mejora la integridad de las credenciales.
 
-### **6.6. Separación de Servicios de Autenticación**
+### **6.6 Separación de Servicios de Autenticación**
 
 Para garantizar un control granular y seguro, se implementaron dos servicios distintos que extienden `UserDetailsService`:
 
@@ -354,11 +387,11 @@ Para fortalecer y ampliar las funcionalidades de **PetMatch**, se proponen las s
 
 ## **8. Apéndices**
 
-### **8.1. Licencia**
+### **8.1 Licencia**
 
 **MIT License**
 
-### **8.2. Referencias**
+### **8.2 Referencias**
 
 * Briceño, E. (2024). Más de 7 millones de perros y gatos abandonados y la oportunidad de volver a casa. _Convive_.
   [https://convoca.pe/convive/mas-de-7-millones-de-perros-y-gatos-abandonados-y-la-oportunidad-de-volver-casa](https://convoca.pe/convive/mas-de-7-millones-de-perros-y-gatos-abandonados-y-la-oportunidad-de-volver-casa)
