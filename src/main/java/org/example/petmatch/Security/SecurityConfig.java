@@ -22,7 +22,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-    private final UserDetailsServiceImpl userdetailsserviceimpl;
+    private final CustomUserDetailsService customUserDetailsService;
     private final JwtAuthorizationFilter jwtFilter;
 
     @Bean
@@ -33,7 +33,7 @@ public class SecurityConfig {
     @Bean
     public AuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
-        provider.setUserDetailsService(userdetailsserviceimpl);
+        provider.setUserDetailsService(customUserDetailsService);
         provider.setPasswordEncoder(passwordEncoder());
         return provider;
     }
@@ -48,26 +48,15 @@ public class SecurityConfig {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        // ✅ Rutas públicas de autenticación (sin token)
-                        .requestMatchers("/user/auth/**").permitAll() // Register y Login de User
-                        .requestMatchers("/albergues/auth/**").permitAll() // Register y Login de Albergue
+                        .requestMatchers("/user/auth/register", "/user/auth/login").permitAll()
+                        .requestMatchers("/albergues/auth/register", "/albergues/auth/login").permitAll()
 
-                        // ✅ Rutas públicas para consultar albergues
-                        .requestMatchers("/albergues").permitAll() // Ver todos los albergues
-                        .requestMatchers("/albergues/near").permitAll() // Ver albergues cercanos
+                        .requestMatchers("/albergues", "/albergues/near").permitAll()
+                        .requestMatchers("/voluntarios", "/voluntarios/*/programas").permitAll()
 
 
-                        // ✅ Rutas públicas de voluntarios
-                        .requestMatchers("/voluntarios").permitAll()
-                        .requestMatchers("/voluntarios/{id}/programas").permitAll()
-
-                        // ✅ Rutas protegidas - Solo usuarios autenticados
                         .requestMatchers("/user/**").hasRole("USER")
-
-                        // ✅ Rutas protegidas - Solo albergues autenticados
                         .requestMatchers("/albergues/**").hasRole("ALBERGUE")
-
-                        // ✅ Cualquier otra ruta requiere autenticación
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session
