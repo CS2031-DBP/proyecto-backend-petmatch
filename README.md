@@ -24,9 +24,8 @@
    4.2 Descripción de Entidades  
 5. Testing y Manejo de Errores  
 6. Medidas de Seguridad Implementadas  
-7. Eventos y Asincronía  
-8. Conclusiones  
-9. Apéndices  
+7. Conclusiones  
+8. Apéndices  
 
 ---
 
@@ -196,6 +195,50 @@ Esta entidad es clave para registrar y gestionar la información de cada animal 
 
 ## **5. Testing y Manejo de Errores**
 
+### **5.1. Niveles de Testing Realizados**
+
+Durante el desarrollo del sistema se implementaron diferentes niveles de prueba para asegurar la **calidad y estabilidad del software**:
+
+* **Pruebas Unitarias:**
+  Se validaron los métodos de servicios y utilidades de seguridad, como la generación y validación de tokens en `JwtService`, garantizando que las operaciones de autenticación funcionen correctamente.
+
+* **Pruebas de Integración:**
+  Se probaron componentes del sistema en conjunto, como los controladores (`UserController`, `AlbergueController`) junto con los servicios (`UserService`, `AlbergueService`), utilizando `MockMvc` para simular peticiones HTTP.
+  Ejemplo: el test `UserControllerTest` valida el registro y autenticación de usuarios verificando códigos de estado y estructura del JSON devuelto.
+
+* **Pruebas de Sistema:**
+  Se realizaron pruebas de flujo completo en endpoints protegidos y públicos, comprobando el correcto funcionamiento de la seguridad JWT y la autorización de roles (`USER`, `ALBERGUE`).
+
+* **Pruebas de Aceptación:**
+  Se verificó que las funcionalidades principales —como registro, login, y acceso a los programas de voluntariado— cumplan con los requerimientos esperados por el usuario final.
+
+### **5.2 Resultados**
+
+* Los endpoints públicos (`/user/auth/**`, `/albergues/auth/**`, `/albergues`, `/voluntarios`) respondieron correctamente sin necesidad de token.
+* Los endpoints protegidos solo permitieron el acceso con tokens JWT válidos, según el tipo de entidad (usuario o albergue).
+* Se detectaron y corrigieron errores relacionados con:
+
+  * **Autenticación inválida:** manejo de tokens expirados o manipulados.
+  * **Autorización incorrecta:** validación de roles dentro del filtro `JwtAuthorizationFilter`.
+  * **Errores de mapeo en DTOs:** ajustes en los campos devueltos por los controladores.
+
+En todos los casos, los tests de controladores (`MockMvc`) retornaron los códigos de estado esperados (`200 OK`, `201 Created`, `403 Forbidden`, `401 Unauthorized`), confirmando la estabilidad del sistema.
+
+### **5.3 Manejo de Errores**
+
+El sistema implementa un manejo de errores **centralizado** mediante excepciones personalizadas y validaciones globales:
+
+* **`JwtAuthorizationFilter`:**
+  Maneja errores de autenticación y validación de tokens JWT, evitando el acceso a rutas protegidas sin un token válido.
+
+* **`UserDetailsServiceImpl` y `AlbergueDetailsServiceImpl`:**
+  Lanza `UsernameNotFoundException` cuando las credenciales no corresponden a un usuario o albergue registrado.
+
+* **Validaciones en Controladores:**
+  Se controlan errores de entrada (como datos incompletos o mal formateados) usando excepciones propias y respuestas JSON estandarizadas.
+
+El manejo centralizado de excepciones permite ofrecer mensajes **claros y consistentes al usuario**, mejorar la **seguridad** del sistema y facilitar la **depuración de errores** durante las pruebas.
+
 ---
 
 ## **6. Medidas de Seguridad Implementadas**
@@ -272,21 +315,50 @@ Para garantizar un control granular y seguro, se implementaron dos servicios dis
 Esta separación permite una gestión más clara de roles, permisos y validación de credenciales en función del tipo de entidad que accede al sistema.
 
 ---
-## **7. Eventos y Asincronía**
+## **7. Conclusión**
+
+### **7.1 Logros del Proyecto**
+
+El desarrollo de **PetMatch** permitió construir una plataforma funcional y segura que facilita la **conexión entre refugios y usuarios** interesados en la adopción y el voluntariado animal.
+Entre los principales logros alcanzados se encuentran:
+
+1. Implementación de un **sistema de autenticación seguro** mediante **JWT (JSON Web Tokens)**, que diferencia entre usuarios y albergues, garantizando la protección de datos y accesos.
+2. Modelado de las entidades principales —`User`, `Shelter`, `Animal` y `VolunteerProgram`— con una estructura relacional clara y eficiente.
+3. Integración de **Spring Security** para gestionar roles, permisos y rutas protegidas de forma controlada.
+4. Ejecución de **pruebas unitarias y de integración** que aseguraron la funcionalidad y estabilidad del sistema.
+5. Diseño de un flujo coherente de registro, autenticación y manejo de datos que mejora la experiencia tanto para usuarios como para albergues.
+
+En conjunto, el proyecto responde de manera efectiva a la **problemática del abandono animal en el Perú**, proporcionando una herramienta tecnológica que **promueve la adopción responsable y la participación ciudadana en programas de voluntariado**.
+
+### **7.2 Aprendizajes Clave**
+
+Durante el desarrollo del proyecto se adquirieron conocimientos relevantes en distintos ámbitos:
+
+1. Comprensión del **ciclo completo de autenticación y autorización** utilizando JWT y Spring Security en entornos sin estado (*stateless*).
+2. Aplicación de **buenas prácticas de modelado de datos** con JPA e Hibernate, incluyendo relaciones bidireccionales y el uso adecuado de anotaciones.
+3. Fortalecimiento en el uso del **framework Spring Boot**, su estructura modular y la integración con servicios REST.
+4. Implementación de estrategias de **manejo global de errores y excepciones**, mejorando la confiabilidad y claridad de las respuestas del sistema.
+5. Consolidación del trabajo colaborativo y la documentación del código como parte del proceso de desarrollo ágil.
+
+### **7.3 Trabajo Futuro**
+
+Para fortalecer y ampliar las funcionalidades de **PetMatch**, se proponen las siguientes líneas de mejora:
+
+1. Incorporar un **sistema de geolocalización avanzada** que permita a los usuarios encontrar refugios cercanos y ver animales disponibles en tiempo real.
+2. Desarrollar un **módulo de adopción digital**, con seguimiento de solicitudes y firma electrónica de formularios.
+3. Integrar **notificaciones automáticas por correo o aplicación móvil**, para mantener informados a los usuarios sobre nuevos animales o programas.
+4. Añadir **métricas y paneles estadísticos** para los refugios, ayudándoles a evaluar su impacto social.
+5. Extender la seguridad con **autenticación multifactor (MFA)** y protocolos OAuth2 para integración con redes sociales.
 
 ---
 
-## **8. Conclusión**
+## **8. Apéndices**
 
----
-
-## **9. Apéndices**
-
-### **9.1. Licencia**
+### **8.1. Licencia**
 
 **MIT License**
 
-### **9.2. Referencias**
+### **8.2. Referencias**
 
 * Briceño, E. (2024). Más de 7 millones de perros y gatos abandonados y la oportunidad de volver a casa. _Convive_.
   [https://convoca.pe/convive/mas-de-7-millones-de-perros-y-gatos-abandonados-y-la-oportunidad-de-volver-casa](https://convoca.pe/convive/mas-de-7-millones-de-perros-y-gatos-abandonados-y-la-oportunidad-de-volver-casa)
