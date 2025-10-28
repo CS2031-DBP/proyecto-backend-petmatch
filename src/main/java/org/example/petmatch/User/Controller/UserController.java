@@ -1,6 +1,7 @@
 package org.example.petmatch.User.Controller;
 
 import jakarta.validation.Valid;
+import jakarta.validation.ValidationException;
 import lombok.RequiredArgsConstructor;
 import org.example.petmatch.Animals.DTO.AnimalPresentationDTO;
 import org.example.petmatch.Animals.DTO.AnimalReportDTO;
@@ -40,7 +41,7 @@ public class UserController {
     }
 
     @PostMapping("/report")
-    public ResponseEntity<AnimalPresentationDTO> createReport(@RequestBody AnimalReportDTO instanceAnimal) {
+    public ResponseEntity<AnimalPresentationDTO> createReport(@RequestBody AnimalReportDTO instanceAnimal) throws ValidationException {
         AnimalPresentationDTO reportDTO = animalService.createReport(instanceAnimal);
         return ResponseEntity.status(HttpStatus.CREATED).body(reportDTO);
     }

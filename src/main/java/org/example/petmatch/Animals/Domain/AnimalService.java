@@ -15,9 +15,7 @@ public class AnimalService {
     private final AnimalRepository animalRepository;
     private final ModelMapper modelMapper;
 
-    public AnimalPresentationDTO createReport(AnimalReportDTO instanceAnimal) throws ValidationException {
-
-
+    public AnimalPresentationDTO createReport(AnimalReportDTO instanceAnimal) {
         Animal animal = modelMapper.map(instanceAnimal, Animal.class);
         animalRepository.save(animal);
         return modelMapper.map(animal, AnimalPresentationDTO.class);
