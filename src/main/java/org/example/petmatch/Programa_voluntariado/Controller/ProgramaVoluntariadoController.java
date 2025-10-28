@@ -37,7 +37,7 @@ public class ProgramaVoluntariadoController {
         return ResponseEntity.ok(voluntarios);
     }
 
-    @PostMapping("/{AlbergueId}")
+    @PostMapping
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<NewIdDTO> createPrograma(@AuthenticationPrincipal UserDetails userDetails, @RequestBody @Valid ProgramaRequestDto programaRequestDto) {
         NewIdDTO programa = programaService.createPrograma(userDetails.getUsername(), programaRequestDto);
@@ -58,6 +58,7 @@ public class ProgramaVoluntariadoController {
         programaService.desinscribirVoluntarioDePrograma(id, voluntarioId);
         return ResponseEntity.noContent().build();
     }
+
     @DeleteMapping("/alberge/{programaid}")
     @PreAuthorize("hasRole('ALBERGUE')")
     public ResponseEntity<Void> desinscribirVoluntarioDeProgramaAlbergue(@PathVariable Long programaid, @RequestParam Long voluntarioId, @AuthenticationPrincipal UserDetails userDetails) {

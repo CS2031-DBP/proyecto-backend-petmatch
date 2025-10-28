@@ -17,14 +17,14 @@ public class ProgramaRequestDto {
     private String descripcion;
 
     @Future
-    @NotEmpty
+    @NotNull
     private ZonedDateTime fechaInicio;
 
-    @NotEmpty
+    @NotNull
     @Future
     private ZonedDateTime fechaFin;
 
-    @NotEmpty
+    @NotNull
     @Max(100)
     @Min(1)
     private Integer numeroVoluntariosNecesarios;
