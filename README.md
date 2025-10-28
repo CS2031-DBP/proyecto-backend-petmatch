@@ -1,5 +1,8 @@
 # **PetMatch: Integración y apoyo en albergues para ayudar a los animales**
 **Curso:** Desarrollo Basado en Plataformas (CS 2031)  
+
+**Postman Collection:** [PostmanCollection](https://asd555-8170.postman.co/workspace/petmatch~a8e471f9-ed4f-4af2-aa04-8d6e9a733429/collection/43516792-bcb6e32d-31db-4ce8-aaa0-d2df52bfdbc0?action=share&creator=43516792&active-environment=43516792-ecbff733-47ce-4eb0-bbb8-2cf1f6e8cd2b)
+
 **Integrantes:**  
 - Valentín Tuesta Barrantes - 202410251  
 - Rayhan Matos Copello - 202410377  
@@ -11,53 +14,33 @@
 ## **Índice**
 
 1. **Introducción**
-
    * 1.1 Contexto
    * 1.2 Objetivos del Proyecto
-
 2. **Identificación del Problema o Necesidad**
-
    * 2.1 Descripción del Problema
    * 2.2 Justificación
-
 3. **Descripción de la Solución**
-
    * 3.1 Funcionalidades Implementadas
    * 3.2 Tecnologías Utilizadas
-
 4. **Modelo de Entidades**
-
    * 4.1 Diagrama de Entidad-Relación (E-R)
    * 4.2 Descripción de Entidades
-
      * 4.2.1 Shelter
      * 4.2.2 User
      * 4.2.3 VolunteerProgram
      * 4.2.4 Animal
-
 5. **Testing y Manejo de Errores**
-
    * 5.1 Niveles de Testing Realizados
    * 5.2 Resultados
    * 5.3 Manejo de Errores
-
 6. **Medidas de Seguridad Implementadas**
-
-   * 6.1 Autenticación y Autorización
-   * 6.2 Generación y Validación del Token
-   * 6.3 Filtro de Autorización
-   * 6.4 Configuración de Roles y Rutas Protegidas
-   * 6.5 Encriptación de Contraseñas
-   * 6.6 Separación de Servicios de Autenticación
-
+   * 6.1 Seguridad de Datos
+   * 6.2 Prevención de Vulnerabilidades
 7. **Conclusión**
-
    * 7.1 Logros del Proyecto
    * 7.2 Aprendizajes Clave
    * 7.3 Trabajo Futuro
-
 8. **Apéndices**
-
    * 8.1 Licencia
    * 8.2 Referencias
 ---
@@ -276,77 +259,58 @@ El manejo centralizado de excepciones permite ofrecer mensajes **claros y consis
 
 ## **6. Medidas de Seguridad Implementadas**
 
-La seguridad de **PetMatch** se basa en el uso de **Spring Security** y **JWT (JSON Web Tokens)** para garantizar una autenticación robusta, separación de roles y protección de rutas sensibles. A continuación, se detallan los principales componentes y mecanismos aplicados.
+### **6.1 Seguridad de Datos**
 
-### **6.1 Autenticación y Autorización**
+El sistema **PetMatch** garantiza la seguridad de la información de usuarios y albergues mediante distintos mecanismos de protección integrados en **Spring Security** y **JWT (JSON Web Token)**.
 
-El sistema implementa un flujo **stateless** (sin sesiones en servidor) basado en tokens JWT.
-Cada vez que un usuario o albergue inicia sesión correctamente, se genera un token firmado que contiene:
+**Principales mecanismos:**
 
-* El correo electrónico del usuario (subject).
-* El tipo de entidad (`USER` o `ALBERGUE`).
-* Una fecha de expiración configurable.
+* **Autenticación basada en JWT:**
+  Cada usuario o albergue registrado obtiene un token JWT firmado digitalmente con el algoritmo **HS256**.
+  Este token contiene el correo electrónico y el tipo de entidad (`USER` o `ALBERGUE`), asegurando la identidad en cada solicitud.
 
-Este token debe enviarse en el encabezado HTTP `Authorization: Bearer <token>` en cada petición posterior.
+* **Gestión de roles y permisos:**
+  Se definen reglas de acceso diferenciadas:
 
-### **6.2 Generación y Validación del Token**
+  * Rutas `/user/**` → accesibles solo por usuarios con el rol `ROLE_USER`.
+  * Rutas `/albergues/**` → accesibles solo por albergues con el rol `ROLE_ALBERGUE`.
+  * Las rutas de registro, login y consulta pública son accesibles sin autenticación.
 
-El servicio `JwtService` es el encargado de manejar los procesos de emisión y verificación de tokens.
-Utiliza una **clave secreta HMAC-SHA256** almacenada en el archivo de configuración (`application.properties`) y un tiempo de expiración definido por variable de entorno (`jwt.expiration`).
+* **Encriptación de contraseñas:**
+  Todas las contraseñas se almacenan usando **BCrypt**, un algoritmo seguro de hash con sal que protege los datos incluso ante filtraciones de la base de datos.
 
-**Características clave:**
+* **Sesiones sin estado (Stateless):**
+  La autenticación se maneja exclusivamente mediante tokens JWT, sin mantener sesiones en el servidor, reduciendo la superficie de ataque y evitando el robo de sesiones.
 
-* Método `generateToken()` → genera el token con los *claims* de tipo y correo.
-* Método `isTokenValid()` → verifica su validez temporal y firma.
-* Método `extractEntityType()` → diferencia entre usuarios y albergues autenticados.
+* **Servicio de autenticación unificado (`CustomUserDetailsService`):**
+  Este servicio permite validar credenciales tanto de **usuarios** como de **albergues**, consultando repositorios separados (`UserRepository` y `ShelterRepository`), lo que asegura un control coherente y centralizado.
 
-### **6.3 Filtro de Autorización**
+### **6.2 Prevención de Vulnerabilidades**
 
-El componente `JwtAuthorizationFilter` intercepta cada solicitud HTTP antes de llegar al controlador.
-Sus principales tareas son:
+Para prevenir vulnerabilidades comunes en aplicaciones web, **PetMatch** implementa las siguientes medidas:
 
-1. Extraer el token del encabezado `Authorization`.
-2. Validar su autenticidad mediante `JwtService`.
-3. Determinar el tipo de entidad (`USER` o `ALBERGUE`).
-4. Cargar los detalles de la entidad correspondiente desde la base de datos (a través de `UserDetailsServiceImpl` o `AlbeguerDetailsServiceImpl`).
-5. Configurar el contexto de seguridad (`SecurityContextHolder`) con las credenciales válidas.
+* **Protección contra inyección SQL:**
+  Todas las operaciones con base de datos se realizan a través de **Spring Data JPA**, utilizando consultas parametrizadas y ORM, evitando la concatenación de strings en sentencias SQL.
 
-Esto garantiza que solo las peticiones con tokens válidos puedan acceder a rutas protegidas.
+* **Prevención de ataques XSS (Cross-Site Scripting):**
+  Las respuestas JSON no incluyen contenido dinámico no validado, y la comunicación entre frontend y backend se maneja con objetos fuertemente tipados, reduciendo el riesgo de ejecución de scripts maliciosos.
 
-### **6.4. Configuración de Roles y Rutas Protegidas**
+* **Desactivación de CSRF en contextos JWT:**
+  Dado que la aplicación es **stateless** (sin cookies de sesión), el token JWT sustituye la validación CSRF, y este mecanismo se desactiva explícitamente en la configuración de seguridad:
 
-El archivo `SecurityConfig` define las políticas de acceso para cada endpoint.
-El sistema diferencia claramente entre **rutas públicas** y **rutas restringidas**:
+  ```java
+  http.csrf(AbstractHttpConfigurer::disable);
+  ```
 
-**Rutas públicas**
+* **Validación del token en cada solicitud:**
+  El filtro `JwtAuthorizationFilter` intercepta todas las peticiones y valida:
 
-* `/user/auth/**` → registro e inicio de sesión de usuarios.
-* `/albergues/auth/**` → registro e inicio de sesión de albergues.
-* `/albergues`, `/albergues/near` → consulta de refugios sin autenticación.
-* `/voluntarios`, `/voluntarios/{id}/programas` → acceso libre a programas de voluntariado.
+  * La existencia del encabezado `Authorization`.
+  * La validez, firma y expiración del token.
+  * La existencia del usuario o albergue en la base de datos.
 
-**Rutas protegidas**
-
-* `/user/**` → requiere autenticación con rol `ROLE_USER`.
-* `/albergues/**` → requiere autenticación con rol `ROLE_ALBERGUE`.
-
-Cualquier otra ruta requiere autenticación por defecto.
-El manejo de sesiones se establece como **STATELESS**, reforzando la seguridad del modelo JWT.
-
-### **6.5 Encriptación de Contraseñas**
-
-Las contraseñas se almacenan utilizando el algoritmo **BCrypt**, implementado mediante el `PasswordEncoder` de Spring Security.
-Este mecanismo añade un *salt* aleatorio en cada hash, lo que evita ataques de tipo *rainbow table* y mejora la integridad de las credenciales.
-
-### **6.6 Separación de Servicios de Autenticación**
-
-Para garantizar un control granular y seguro, se implementaron dos servicios distintos que extienden `UserDetailsService`:
-
-* **`UserDetailsServiceImpl`** → gestiona la autenticación de usuarios comunes.
-* **`AlbeguerDetailsServiceImpl`** → gestiona la autenticación de albergues.
-
-Esta separación permite una gestión más clara de roles, permisos y validación de credenciales en función del tipo de entidad que accede al sistema.
-
+* **Control de acceso centralizado:**
+  Las rutas protegidas están declaradas explícitamente en `SecurityConfig`, garantizando que solo los roles adecuados puedan acceder a cada endpoint.
 ---
 ## **7. Conclusión**
 
@@ -381,8 +345,6 @@ Para fortalecer y ampliar las funcionalidades de **PetMatch**, se proponen las s
 2. Desarrollar un **módulo de adopción digital**, con seguimiento de solicitudes y firma electrónica de formularios.
 3. Integrar **notificaciones automáticas por correo o aplicación móvil**, para mantener informados a los usuarios sobre nuevos animales o programas.
 4. Añadir **métricas y paneles estadísticos** para los refugios, ayudándoles a evaluar su impacto social.
-5. Extender la seguridad con **autenticación multifactor (MFA)** y protocolos OAuth2 para integración con redes sociales.
-
 ---
 
 ## **8. Apéndices**
