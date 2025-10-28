@@ -1,5 +1,6 @@
 package org.example.petmatch.voluntario;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.example.petmatch.Programa_voluntariado.DTO.ProgramaResponseDto;
 import org.example.petmatch.Voluntario.Controller.VoluntarioController;
 import org.example.petmatch.Voluntario.Domain.VoluntarioService;
@@ -9,8 +10,11 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
@@ -26,75 +30,82 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(VoluntarioController.class)
-@ExtendWith(SpringExtension.class)
+@SpringBootTest
+@AutoConfigureMockMvc
 public class VoluntarioControllerTest {
     @Autowired
     MockMvc mockMvc;
+
+    @Autowired
+    private ObjectMapper objectMapper;
 
     @MockitoBean
     VoluntarioService voluntarioService;
 
     @Test
-    @DisplayName("shouldReturnListOfVoluntariosWhenGetAllVoluntariosIsCalled")
-    void shouldReturnListOfVoluntariosWhenGetAllVoluntariosIsCalled() throws Exception {
-        // given
-        var v1 = new VoluntarioResponseDto();
-        v1.setId(1L);
-        v1.setName("Ana");
-        v1.setLastname("Lopez");
-        v1.setEmail("ana@test.com");
-
-        var v2 = new VoluntarioResponseDto();
-        v2.setId(2L);
-        v2.setName("Bruno");
-        v2.setLastname("Diaz");
-        v2.setEmail("bruno@test.com");
-
-        when(voluntarioService.getAllVoluntarios()).thenReturn(List.of(v1, v2));
-
-        // when + then
+    @WithMockUser
+    public void ShouldReturnOkWhenVoluntariosExist() throws Exception {
+        VoluntarioResponseDto voluntario1 = new VoluntarioResponseDto();
+        voluntario1.setId(1L);
+        voluntario1.setName("Juan");
+        voluntario1.setLastname("Perez");
+        voluntario1.setEmail("jp@gmail.com");
+        VoluntarioResponseDto voluntario2 = new VoluntarioResponseDto();
+        voluntario2.setId(2L);
+        voluntario2.setName("Ana");
+        voluntario2.setLastname("Gomez");
+        voluntario2.setEmail("ag@gmail.com");
+        when(voluntarioService.getAllVoluntarios()).thenReturn(List.of(voluntario1, voluntario2));
         mockMvc.perform(get("/voluntarios")
-                        .accept(MediaType.APPLICATION_JSON))
+                        .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()").value(2))
-                .andExpect(jsonPath("$[0].name").value("Ana"))
-                .andExpect(jsonPath("$[1].email").value("bruno@test.com"));
+                .andExpect(content().json(objectMapper.writeValueAsString(List.of(voluntario1, voluntario2))));
     }
 
     @Test
-    @DisplayName("shouldReturnListOfProgramasWhenVoluntarioExists")
-    void shouldReturnListOfProgramasWhenVoluntarioExists() throws Exception {
-        // given
-        var p1 = new ProgramaResponseDto();
-        p1.setId(10L);
-        p1.setNombre("Rescate");
-        var p2 = new ProgramaResponseDto();
-        p2.setId(11L);
-        p2.setNombre("Adopciones");
-
-        when(voluntarioService.getProgramaByVoluntarioId(1L)).thenReturn(List.of(p1, p2));
-
-        // when + then
+    @WithMockUser
+    public void ShouldReturnEmptyListWhenNoVoluntariosExist() throws Exception {
+        when(voluntarioService.getAllVoluntarios()).thenReturn(List.of());
+        mockMvc.perform(get("/voluntarios")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().json("[]"));
+    }
+    @Test
+    @WithMockUser
+    public void ShouldReturnOkWhenProgramasExistForVoluntario() throws Exception {
+        ProgramaResponseDto programa1 = new ProgramaResponseDto();
+        programa1.setId(1L);
+        programa1.setNombre("Programa 1");
+        programa1.setDescripcion("Descripcion 1");
+        ProgramaResponseDto programa2 = new ProgramaResponseDto();
+        programa2.setId(2L);
+        programa2.setNombre("Programa 2");
+        programa2.setDescripcion("Descripcion 2");
+        when(voluntarioService.getProgramaByVoluntarioId(anyLong())).thenReturn(List.of(programa1, programa2));
         mockMvc.perform(get("/voluntarios/1/programas")
-                        .accept(MediaType.APPLICATION_JSON))
+                        .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()").value(2))
-                .andExpect(jsonPath("$[0].nombre").value("Rescate"))
-                .andExpect(jsonPath("$[1].nombre").value("Adopciones"));
+                .andExpect(content().json(objectMapper.writeValueAsString(List.of(programa1, programa2))));
     }
 
     @Test
-    @DisplayName("shouldReturn404WhenVoluntarioNotFound")
-    void shouldReturn404WhenVoluntarioNotFound() throws Exception {
-        // given
-        when(voluntarioService.getProgramaByVoluntarioId(anyLong()))
-                .thenThrow(new VoluntarioNotFoundException("Voluntario no encontrado con id: 99"));
-
-        // when + then
-        mockMvc.perform(get("/voluntarios/99/programas")
-                        .accept(MediaType.APPLICATION_JSON))
+    @WithMockUser
+    public void ShouldReturnNotFoundWhenVoluntarioDoesNotExist() throws Exception {
+        when(voluntarioService.getProgramaByVoluntarioId(anyLong())).thenThrow(new VoluntarioNotFoundException("Voluntario not found"));
+        mockMvc.perform(get("/voluntarios/999/programas")
+                        .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @WithMockUser
+    public void ShouldReturnEmptyListWhenNoProgramasForVoluntario() throws Exception {
+        when(voluntarioService.getProgramaByVoluntarioId(anyLong())).thenReturn(List.of());
+        mockMvc.perform(get("/voluntarios/1/programas")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().json("[]"));
     }
 }
 

@@ -57,7 +57,7 @@ public class Albergue {
     private List<User> seguidores;
 
 
-    @Enumerated
+    @Enumerated(EnumType.STRING)
     @Column(name = "rating")
     private Rating rating;
 }
