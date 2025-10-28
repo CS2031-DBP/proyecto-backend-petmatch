@@ -1,8 +1,9 @@
 package org.example.petmatch.Animals.Controller;
 
-import jakarta.validation.ValidationException;
+import org.example.petmatch.Exception.ValidationException;
 import lombok.RequiredArgsConstructor;
 import org.example.petmatch.Animals.DTO.AnimalPresentationDTO;
+import org.example.petmatch.Animals.Domain.AnimalService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -15,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/animales")
 public class AnimalController {
 
-    private final AnimalController animalService;
+    private final AnimalService animalService;
 
     @PatchMapping("/{animalName}/asignar/{shelterName}")
     public ResponseEntity<AnimalPresentationDTO> assignShelterToAnimal(
