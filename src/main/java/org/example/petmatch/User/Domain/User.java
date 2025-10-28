@@ -3,7 +3,7 @@ package org.example.petmatch.User.Domain;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import lombok.*;
-import org.example.petmatch.Comentarios.Domain.Comentario;
+import org.example.petmatch.Comments.Domain.Comments;
 
 import java.util.List;
 
@@ -35,6 +35,6 @@ public class User {
     private Role role;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Comentario> comentarios;
+    private List<Comments> comments;
 
 }

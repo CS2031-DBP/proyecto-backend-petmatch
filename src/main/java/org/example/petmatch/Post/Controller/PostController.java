@@ -2,7 +2,7 @@ package org.example.petmatch.Post.Controller;
 
 import lombok.RequiredArgsConstructor;
 import org.example.petmatch.Common.NewIdDTO;
-import org.example.petmatch.Albergue.Exceptions.ValidationException;
+import org.example.petmatch.Shelter.Exceptions.ValidationException;
 import org.example.petmatch.Post.DTO.PostViewDTO;
 import org.example.petmatch.Post.DTO.RequestPostDTO;
 import org.example.petmatch.Post.Domain.Post;

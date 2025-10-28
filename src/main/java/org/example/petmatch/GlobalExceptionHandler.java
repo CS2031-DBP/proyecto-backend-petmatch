@@ -1,17 +1,17 @@
 package org.example.petmatch;
 
-import org.example.petmatch.Albergue.Exceptions.AlbergueAlreadyExistsException;
-import org.example.petmatch.Albergue.Exceptions.AlbergueNotFoundException;
-import org.example.petmatch.Albergue.Exceptions.ValidationException;
+import org.example.petmatch.Shelter.Exceptions.ShelterAlreadyExistsException;
+import org.example.petmatch.Shelter.Exceptions.ShelterNotFoundException;
+import org.example.petmatch.Shelter.Exceptions.ValidationException;
 import org.example.petmatch.Exception.NotFoundException;
-import org.example.petmatch.Inscripcion.exception.AlreadyEnrolledException;
-import org.example.petmatch.Inscripcion.exception.InscripcionNotFoundException;
-import org.example.petmatch.Programa_voluntariado.exception.ProgramaIsFullException;
-import org.example.petmatch.Programa_voluntariado.exception.ProgramaNotFoundException;
+import org.example.petmatch.Inscription.exception.AlreadyEnrolledException;
+import org.example.petmatch.Inscription.exception.InscriptionNotFoundException;
+import org.example.petmatch.Volunteer_Program.exception.VolunteerProgramIsFullException;
+import org.example.petmatch.Volunteer_Program.exception.VolunteerProgramNotFoundException;
 import org.example.petmatch.User.Exceptions.InvalidCredentialsException;
 import org.example.petmatch.User.Exceptions.UserAlreadyExistsException;
 import org.example.petmatch.User.Exceptions.UserNotFoundException;
-import org.example.petmatch.Voluntario.exception.VoluntarioNotFoundException;
+import org.example.petmatch.Volunteer.exception.VolunteerNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -58,15 +58,15 @@ public class GlobalExceptionHandler {
         return buildErrorResponse(HttpStatus.NOT_FOUND,  "El usuario ya se encuentra registrado", ex.getMessage());
     }
 
-    @ExceptionHandler(AlbergueAlreadyExistsException.class)
+    @ExceptionHandler(ShelterAlreadyExistsException.class)
     public ResponseEntity<Map<String, Object>> handleAlbergueAlreadyExistsException(
-            AlbergueAlreadyExistsException ex) {
+            ShelterAlreadyExistsException ex) {
         return buildErrorResponse(HttpStatus.CONFLICT, "El albergue ya se encuentra registrado", ex.getMessage());
     }
 
-    @ExceptionHandler(AlbergueNotFoundException.class)
+    @ExceptionHandler(ShelterNotFoundException.class)
     public ResponseEntity<Map<String, Object>> handleAlbergueNotFoundException(
-            AlbergueNotFoundException ex) {
+            ShelterNotFoundException ex) {
         return buildErrorResponse(HttpStatus.NOT_FOUND, "Albergue no encontardo", ex.getMessage());
     }
 
@@ -76,27 +76,27 @@ public class GlobalExceptionHandler {
         return buildErrorResponse(HttpStatus.CONFLICT, "El usuario ya se encuentra inscripto en el programa", ex.getMessage());
     }
 
-    @ExceptionHandler(InscripcionNotFoundException.class)
+    @ExceptionHandler(InscriptionNotFoundException.class)
     public ResponseEntity<Map<String, Object>> handleInscripcionNotFoundException(
-            InscripcionNotFoundException ex) {
+            InscriptionNotFoundException ex) {
         return buildErrorResponse(HttpStatus.NOT_FOUND, "Inscripcion no encontrada", ex.getMessage());
     }
 
-    @ExceptionHandler(ProgramaIsFullException.class)
+    @ExceptionHandler(VolunteerProgramIsFullException.class)
     public ResponseEntity<Map<String, Object>> handleProgramaIsFullException(
-            ProgramaIsFullException ex) {
+            VolunteerProgramIsFullException ex) {
         return buildErrorResponse(HttpStatus.BAD_REQUEST, "El programa ya ha alcanzado el número máximo de voluntarios", ex.getMessage());
     }
 
-    @ExceptionHandler(ProgramaNotFoundException.class)
+    @ExceptionHandler(VolunteerProgramNotFoundException.class)
     public ResponseEntity<Map<String, Object>> handleProgramaNotFoundException(
-            ProgramaNotFoundException ex) {
+            VolunteerProgramNotFoundException ex) {
         return buildErrorResponse(HttpStatus.NOT_FOUND, "Programa no encontrado", ex.getMessage());
     }
 
-    @ExceptionHandler(VoluntarioNotFoundException.class)
+    @ExceptionHandler(VolunteerNotFoundException.class)
     public ResponseEntity<Map<String, Object>> handleVoluntarioNotFoundException(
-            VoluntarioNotFoundException ex) {
+            VolunteerNotFoundException ex) {
         return buildErrorResponse(HttpStatus.NOT_FOUND, "Voluntario no encontrado", ex.getMessage());
     }
 

@@ -1,9 +1,9 @@
 package org.example.petmatch.Post.Domain;
 
 import lombok.RequiredArgsConstructor;
-import org.example.petmatch.Albergue.Domain.Albergue;
-import org.example.petmatch.Albergue.Infraestructure.AlbergueRepository;
-import org.example.petmatch.Albergue.Exceptions.ValidationException;
+import org.example.petmatch.Shelter.Domain.Shelter;
+import org.example.petmatch.Shelter.Infraestructure.ShelterRepository;
+import org.example.petmatch.Shelter.Exceptions.ValidationException;
 import org.example.petmatch.Exception.NotFoundException;
 import org.example.petmatch.Post.DTO.PostViewDTO;
 import org.example.petmatch.Post.DTO.RequestPostDTO;
@@ -19,7 +19,7 @@ import java.util.List;
 public class PostService {
 
 
-    private final AlbergueRepository albergueRepository;
+    private final ShelterRepository shelterRepository;
     private final ModelMapper modelMapper;
     private final PostRepository postRepository;
 
@@ -35,11 +35,11 @@ public class PostService {
         if (postRepository.findByTitle(postDTO.getTitle()).isPresent()) {
             throw new ValidationException("Existe ya un post con este nombre");
         }
-        Albergue albergue = albergueRepository.findByName(albergue_name).orElseThrow(()-> new NotFoundException("Albergue no encontrado"));
+        Shelter shelter = shelterRepository.findByName(albergue_name).orElseThrow(()-> new NotFoundException("Albergue no encontrado"));
 
         Post post = modelMapper.map(postDTO, Post.class);
-        post.setAlbergue(albergue);
-        albergue.getPosts().add(post);
+        post.setShelter(shelter);
+        shelter.getPosts().add(post);
         postRepository.save(post);
         return post;
     }
@@ -57,8 +57,8 @@ public class PostService {
     }
 
     public List<PostViewDTO> getPostsByAlbergue(String albergueName) {
-        Albergue albergue_requerido = albergueRepository.findByName(albergueName).orElseThrow(()-> new NotFoundException("Albergue no encontrado"));
-        return albergue_requerido.getPosts().stream()
+        Shelter shelter_requerido = shelterRepository.findByName(albergueName).orElseThrow(()-> new NotFoundException("Albergue no encontrado"));
+        return shelter_requerido.getPosts().stream()
                 .map(post -> modelMapper.map(post, PostViewDTO.class))
                 .toList();
 

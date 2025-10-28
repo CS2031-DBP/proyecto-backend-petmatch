@@ -1,7 +1,7 @@
 package org.example.petmatch.Post.Domain;
 
-import org.example.petmatch.Albergue.Domain.Albergue;
-import org.example.petmatch.Comentarios.Domain.Comentario;
+import org.example.petmatch.Shelter.Domain.Shelter;
+import org.example.petmatch.Comments.Domain.Comments;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -29,10 +29,10 @@ public class Post {
 
     @ManyToOne
     @JoinColumn(name = "albergue_id")
-    private Albergue albergue;
+    private Shelter shelter;
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Comentario> comentarios;
+    private List<Comments> comments;
 
 
 }

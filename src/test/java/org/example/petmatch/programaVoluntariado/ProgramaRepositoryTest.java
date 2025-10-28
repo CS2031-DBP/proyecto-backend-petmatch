@@ -1,10 +1,10 @@
 package org.example.petmatch.programaVoluntariado;
 
-import org.example.petmatch.Albergue.Domain.Albergue;
-import org.example.petmatch.Programa_voluntariado.Domain.ProgramaStatus;
-import org.example.petmatch.Programa_voluntariado.Domain.ProgramaVoluntariado;
-import org.example.petmatch.Programa_voluntariado.Infraestructure.ProgramaVoluntariadoRepository;
-import org.example.petmatch.Voluntario.Domain.Voluntario;
+import org.example.petmatch.Shelter.Domain.Shelter;
+import org.example.petmatch.Volunteer_Program.Domain.VolunteerProgramStatus;
+import org.example.petmatch.Volunteer_Program.Domain.VolunteerProgram;
+import org.example.petmatch.Volunteer_Program.Infraestructure.VolunteerProgramRepository;
+import org.example.petmatch.Volunteer.Domain.Volunteer;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,18 +41,18 @@ public class ProgramaRepositoryTest {
     TestEntityManager em;
 
     @Autowired
-    ProgramaVoluntariadoRepository programaRepo;
+    VolunteerProgramRepository programaRepo;
 
-    private Albergue albergue(String email, String address) {
-        Albergue a = new Albergue();
+    private Shelter albergue(String email, String address) {
+        Shelter a = new Shelter();
         a.setEmail(email);
         a.setPassword("x");
         a.setAddress(address);
         return a;
     }
 
-    private ProgramaVoluntariado programa(String nombre, int necesarios, ProgramaStatus status) {
-        ProgramaVoluntariado p = new ProgramaVoluntariado();
+    private VolunteerProgram programa(String nombre, int necesarios, VolunteerProgramStatus status) {
+        VolunteerProgram p = new VolunteerProgram();
         p.setNombre(nombre);
         p.setDescripcion("desc " + nombre);
         p.setFechaInicio(ZonedDateTime.now().minusDays(2));
@@ -64,8 +64,8 @@ public class ProgramaRepositoryTest {
         return p;
     }
 
-    private Voluntario voluntario(String email) {
-        Voluntario v = new Voluntario();
+    private Volunteer voluntario(String email) {
+        Volunteer v = new Volunteer();
         v.setEmail(email);
         v.setPassword("x");
         v.setName("Vol");
@@ -73,7 +73,7 @@ public class ProgramaRepositoryTest {
         return v;
     }
 
-    private void inscribir(Voluntario v, ProgramaVoluntariado p) {
+    private void inscribir(Volunteer v, VolunteerProgram p) {
         v.addInscripcion(p);
         em.persist(v);
         em.flush();
@@ -83,10 +83,10 @@ public class ProgramaRepositoryTest {
     @Test
     @DisplayName("shouldPersistAndLoadProgramaWhenSaved")
     void shouldPersistAndLoadProgramaWhenSaved() {
-        var p = programa("Rescate", 5, ProgramaStatus.ABIERTO);
+        var p = programa("Rescate", 5, VolunteerProgramStatus.ABIERTO);
         p = em.persistFlushFind(p);
 
-        Optional<ProgramaVoluntariado> found = programaRepo.findById(p.getId());
+        Optional<VolunteerProgram> found = programaRepo.findById(p.getId());
 
         assertThat(found).isPresent();
         assertThat(found.get().getNombre()).isEqualTo("Rescate");
@@ -105,19 +105,19 @@ public class ProgramaRepositoryTest {
         var alb = albergue("alb@x.com", "Av. Siempre Viva 742");
         alb = em.persistFlushFind(alb);
 
-        var p = programa("Adopciones", 10, ProgramaStatus.ABIERTO);
-        p.setAlbergue(alb);
+        var p = programa("Adopciones", 10, VolunteerProgramStatus.ABIERTO);
+        p.setShelter(alb);
         p = em.persistFlushFind(p);
 
         var again = programaRepo.findById(p.getId()).orElseThrow();
-        assertThat(again.getAlbergue().getEmail()).isEqualTo("alb@x.com");
+        assertThat(again.getShelter().getEmail()).isEqualTo("alb@x.com");
         assertThat(again.getUbicacion()).isEqualTo("Lima");
     }
 
     @Test
     @DisplayName("shouldReflectVoluntariosViaInscripciones")
     void shouldReflectVoluntariosViaInscripciones() {
-        var p = em.persistFlushFind(programa("Esterilización", 3, ProgramaStatus.ABIERTO));
+        var p = em.persistFlushFind(programa("Esterilización", 3, VolunteerProgramStatus.ABIERTO));
         var v1 = em.persistFlushFind(voluntario("a@x.com"));
         var v2 = em.persistFlushFind(voluntario("b@x.com"));
 
@@ -126,7 +126,7 @@ public class ProgramaRepositoryTest {
 
         var reloaded = programaRepo.findById(p.getId()).orElseThrow();
 
-        assertThat(reloaded.getVoluntarios()).extracting(Voluntario::getEmail)
+        assertThat(reloaded.getVoluntarios()).extracting(Volunteer::getEmail)
                 .containsExactlyInAnyOrder("a@x.com", "b@x.com");
         assertThat(reloaded.getNumeroVoluntariosInscritos()).isEqualTo(2);
     }
@@ -134,7 +134,7 @@ public class ProgramaRepositoryTest {
     @Test
     @DisplayName("shouldMarkFullWhenInscritosReachNecesarios")
     void shouldMarkFullWhenInscritosReachNecesarios() {
-        var p = em.persistFlushFind(programa("Vacunatón", 2, ProgramaStatus.ABIERTO));
+        var p = em.persistFlushFind(programa("Vacunatón", 2, VolunteerProgramStatus.ABIERTO));
         var v1 = em.persistFlushFind(voluntario("v1@x.com"));
         var v2 = em.persistFlushFind(voluntario("v2@x.com"));
 
@@ -143,14 +143,14 @@ public class ProgramaRepositoryTest {
 
         var reloaded = programaRepo.findById(p.getId()).orElseThrow();
         assertThat(reloaded.getNumeroVoluntariosInscritos()).isEqualTo(2);
-        assertThat(reloaded.getStatus()).isEqualTo(ProgramaStatus.LLENO);
+        assertThat(reloaded.getStatus()).isEqualTo(VolunteerProgramStatus.LLENO);
         assertThat(reloaded.isLleno()).isTrue();
     }
 
     @Test
     @DisplayName("shouldRemoveInscripcionAndUpdateCountersWhenVoluntarioRemoves")
     void shouldRemoveInscripcionAndUpdateCountersWhenVoluntarioRemoves() {
-        var p = em.persistFlushFind(programa("Campaña", 2, ProgramaStatus.ABIERTO));
+        var p = em.persistFlushFind(programa("Campaña", 2, VolunteerProgramStatus.ABIERTO));
         var v1 = em.persistFlushFind(voluntario("v1@x.com"));
         var v2 = em.persistFlushFind(voluntario("v2@x.com"));
 
@@ -158,23 +158,23 @@ public class ProgramaRepositoryTest {
         inscribir(v2, p);
 
 
-        var managedVol = em.find(Voluntario.class, v2.getId());
-        var managedProg = em.find(ProgramaVoluntariado.class, p.getId());
+        var managedVol = em.find(Volunteer.class, v2.getId());
+        var managedProg = em.find(VolunteerProgram.class, p.getId());
         managedVol.removeInscripcion(managedProg);
         em.flush();
         em.clear();
 
         var reloaded = programaRepo.findById(p.getId()).orElseThrow();
         assertThat(reloaded.getNumeroVoluntariosInscritos()).isEqualTo(1);
-        assertThat(reloaded.getStatus()).isEqualTo(ProgramaStatus.ABIERTO);
-        assertThat(reloaded.getVoluntarios()).extracting(Voluntario::getEmail)
+        assertThat(reloaded.getStatus()).isEqualTo(VolunteerProgramStatus.ABIERTO);
+        assertThat(reloaded.getVoluntarios()).extracting(Volunteer::getEmail)
                 .containsExactly("v1@x.com");
     }
 
     @Test
     @DisplayName("shouldExistByIdWhenSavedAndShouldDeleteById")
     void shouldExistByIdWhenSavedAndShouldDeleteById() {
-        var p = em.persistFlushFind(programa("Esterilización masiva", 5, ProgramaStatus.ABIERTO));
+        var p = em.persistFlushFind(programa("Esterilización masiva", 5, VolunteerProgramStatus.ABIERTO));
 
         assertThat(programaRepo.existsById(p.getId())).isTrue();
 
