@@ -55,13 +55,13 @@ public class VolunteerRepositoryTest {
 
     private VolunteerProgram programa(String nombre) {
         VolunteerProgram p = new VolunteerProgram();
-        p.setNombre(nombre);
-        p.setDescripcion("desc " + nombre);
-        p.setFechaInicio(ZonedDateTime.now().minusDays(5));
-        p.setFechaFin(ZonedDateTime.now().plusDays(5));
-        p.setUbicacion("Lima");
-        p.setNumeroVoluntariosNecesarios(10);
-        p.setNumeroVoluntariosInscritos(0);
+        p.setName(nombre);
+        p.setDescription("desc " + nombre);
+        p.setStartDate(ZonedDateTime.now().minusDays(5));
+        p.setFinishDate(ZonedDateTime.now().plusDays(5));
+        p.setLocation("Lima");
+        p.setNecessaryVolunteers(10);
+        p.setEnrolledVolunteers(0);
         p.setStatus(VolunteerProgramStatus.ABIERTO); // ajusta según tu enum
         return p;
     }
@@ -116,38 +116,38 @@ public class VolunteerRepositoryTest {
         p2 = em.persistFlushFind(p2);
 
 
-        v.addInscripcion(p1);
-        v.addInscripcion(p2);
+        v.addInscription(p1);
+        v.addInscription(p2);
 
         v = em.persistFlushFind(v);
 
 
-        assertThat(v.getInscripciones()).hasSize(2);
-        assertThat(v.getProgramas()).hasSize(2);
-        assertThat(v.getProgramas())
-                .extracting(VolunteerProgram::getNombre)
+        assertThat(v.getInscriptions()).hasSize(2);
+        assertThat(v.getPrograms()).hasSize(2);
+        assertThat(v.getPrograms())
+                .extracting(VolunteerProgram::getName)
                 .containsExactlyInAnyOrder("Rescate", "Adopciones");
     }
 
     @Test
     @DisplayName("shouldRemoveInscripcionWhenOrphanRemovalIsTrue")
-    void shouldRemoveInscripcionWhenOrphanRemovalIsTrue() {
+    void shouldRemoveInscriptionWhenOrphanRemovalIsTrue() {
         var v = voluntario("Diego", "Suarez", "diego@test.com");
         var p = programa("Esterilizacion");
         p = em.persistFlushFind(p);
 
-        v.addInscripcion(p);
+        v.addInscription(p);
         v = em.persistFlushFind(v);
 
 
-        assertThat(v.getInscripciones()).hasSize(1);
+        assertThat(v.getInscriptions()).hasSize(1);
 
 
-        v.removeInscripcion(p);
+        v.removeInscription(p);
         v = em.persistFlushFind(v);
 
-        assertThat(v.getInscripciones()).isEmpty();
-        assertThat(v.getProgramas()).isEmpty();
+        assertThat(v.getInscriptions()).isEmpty();
+        assertThat(v.getPrograms()).isEmpty();
 
     }
 

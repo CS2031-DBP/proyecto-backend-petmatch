@@ -50,13 +50,13 @@ public class VolunteerServiceTest {
     private VolunteerProgram programa(Long id, String nombre) {
         VolunteerProgram p = new VolunteerProgram();
         p.setId(id);
-        p.setNombre(nombre);
-        p.setDescripcion("desc " + nombre);
-        p.setFechaInicio(ZonedDateTime.now().minusDays(10));
-        p.setFechaFin(ZonedDateTime.now().plusDays(10));
-        p.setUbicacion("Lima");
-        p.setNumeroVoluntariosNecesarios(5);
-        p.setNumeroVoluntariosInscritos(0);
+        p.setName(nombre);
+        p.setDescription("desc " + nombre);
+        p.setStartDate(ZonedDateTime.now().minusDays(10));
+        p.setFinishDate(ZonedDateTime.now().plusDays(10));
+        p.setLocation("Lima");
+        p.setNecessaryVolunteers(5);
+        p.setEnrolledVolunteers(0);
         p.setStatus(VolunteerProgramStatus.ABIERTO); // o el que corresponda
         return p;
     }
@@ -102,8 +102,8 @@ public class VolunteerServiceTest {
         VolunteerProgram p1 = programa(100L, "Rescate");
         VolunteerProgram p2 = programa(101L, "Adopciones");
 
-        vol.addInscripcion(p1);
-        vol.addInscripcion(p2);
+        vol.addInscription(p1);
+        vol.addInscription(p2);
         when(volunteerRepository.findById(33L)).thenReturn(Optional.of(vol));
 
 

@@ -19,42 +19,42 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table (name = "programas_de_voluntariado")
+@Table (name = "volunteerPrograms")
 public class VolunteerProgram {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(nullable = false)
-    private String nombre;
+    private String name;
 
     @Column(nullable = false, length = 1000)
-    private String descripcion;
+    private String description;
 
     @Column(nullable = false)
-    private ZonedDateTime fechaInicio;
+    private ZonedDateTime startDate;
 
     @Column(nullable = false)
-    private ZonedDateTime fechaFin;
+    private ZonedDateTime finishDate;
 
     @Column(nullable = false)
-    private String ubicacion;
+    private String location;
 
     @Column(nullable = false)
-    private Integer numeroVoluntariosNecesarios;
+    private Integer necessaryVolunteers;
 
-    private Integer numeroVoluntariosInscritos = 0;
+    private Integer enrolledVolunteers = 0;
 
     @Enumerated(EnumType.STRING)
     private VolunteerProgramStatus status;
 
 
-    @OneToMany(mappedBy = "programaVoluntariado", orphanRemoval = true)
-    private List<Inscription> inscritos = new ArrayList<>();
+    @OneToMany(mappedBy = "volunteerProgram", orphanRemoval = true)
+    private List<Inscription> enrolled = new ArrayList<>();
 
     public List<Volunteer> getVoluntarios(){
         List<Volunteer> volunteers = new ArrayList<>();
-        for(Inscription inscription : inscritos){
+        for(Inscription inscription : enrolled){
             volunteers.add(inscription.getVolunteer());
         }
         return volunteers;
@@ -66,6 +66,6 @@ public class VolunteerProgram {
 
 
     @ManyToOne
-    @JoinColumn(name = "albergue_id")
+    @JoinColumn(name = "shelter_id")
     private Shelter shelter;
 }

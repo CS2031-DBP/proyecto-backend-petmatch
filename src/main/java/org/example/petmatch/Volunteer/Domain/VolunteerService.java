@@ -26,6 +26,6 @@ public class VolunteerService {
 
     public List<VolunteerProgramResponseDto> getProgramaByVoluntarioId(Long id){
         Volunteer volunteer = volunteerRepository.findById(id).orElseThrow(() -> new VolunteerNotFoundException("Voluntario no encontrado con id: " + id));
-        return volunteer.getProgramas().stream().map(programa -> modelMapper.map(programa, VolunteerProgramResponseDto.class)).toList();
+        return volunteer.getPrograms().stream().map(programa -> modelMapper.map(programa, VolunteerProgramResponseDto.class)).toList();
     }
 }

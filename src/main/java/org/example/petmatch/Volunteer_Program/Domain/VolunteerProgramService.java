@@ -58,7 +58,7 @@ public class VolunteerProgramService {
         VolunteerProgram programa = modelMapper.map(programaResponseDto, VolunteerProgram.class);
         Shelter shelter = shelterRepository.findById(AlbergueId).orElseThrow(() -> new RuntimeException("Albergue con id " + AlbergueId + " no encontrado"));
         programa.setShelter(shelter);
-        programa.setUbicacion(shelter.getAddress());
+        programa.setLocation(shelter.getAddress());
         VolunteerProgram savedPrograma = programaRepository.save(programa);
         return new NewIdDTO(savedPrograma.getId());
     }
@@ -68,20 +68,20 @@ public class VolunteerProgramService {
 
         VolunteerProgram programa = programaRepository.findById(programaId)
                 .orElseThrow(() -> new VolunteerProgramNotFoundException("Programa de voluntariado con id " + programaId + " no encontrado"));
-        if(inscriptionRepository.existsByVoluntarioIdAndProgramaVoluntariadoId(voluntarioId, programaId)) {
+        if(inscriptionRepository.existsByVolunteerIdAndVolunteerProgramId(voluntarioId, programaId)) {
             throw new AlreadyEnrolledException("El voluntario con id " + voluntarioId + " ya está inscrito en el programa con id " + programaId);
         }
         if(programa.isLleno()){
             throw new VolunteerProgramIsFullException("El programa con id " + programaId + " ya ha alcanzado el número máximo de voluntarios");
         }
 
-        Integer numInscritos = programa.getNumeroVoluntariosInscritos();
-        programa.setNumeroVoluntariosInscritos(numInscritos + 1);
-        if(numInscritos + 1 >= programa.getNumeroVoluntariosNecesarios()){
+        Integer numInscritos = programa.getEnrolledVolunteers();
+        programa.setEnrolledVolunteers(numInscritos + 1);
+        if(numInscritos + 1 >= programa.getNecessaryVolunteers()){
             programa.setStatus(VolunteerProgramStatus.LLENO);
         }
         Volunteer volunteer = encontrarOCrearVoluntario(voluntarioId);
-        volunteer.addInscripcion(programa);
+        volunteer.addInscription(programa);
         Inscription inscription = new Inscription(volunteer, programa);
         inscriptionRepository.save(inscription);
     }
@@ -92,9 +92,9 @@ public class VolunteerProgramService {
                 .orElseThrow(() -> new VolunteerProgramNotFoundException("Programa de voluntariado con id " + programaId + " no encontrado"));
         Volunteer volunteer = volunteerRepository.findById(voluntarioId)
                 .orElseThrow(() -> new VolunteerNotFoundException("Voluntario con id " + voluntarioId + " no encontrado"));
-        Inscription inscription = inscriptionRepository.findByVoluntarioIdAndProgramaVoluntariadoId(voluntarioId, programaId)
+        Inscription inscription = inscriptionRepository.findByVolunteerIdAndVolunteerProgramId(voluntarioId, programaId)
                 .orElseThrow(() -> new RuntimeException("El voluntario con id " + voluntarioId + " no está inscrito en el programa con id " + programaId));
-        volunteer.removeInscripcion(programa);
+        volunteer.removeInscription(programa);
         inscriptionRepository.delete(inscription);
     }
 
@@ -113,10 +113,10 @@ public class VolunteerProgramService {
         Volunteer volunteer = volunteerRepository.findById(voluntarioId)
                 .orElseThrow(() -> new VolunteerNotFoundException("Voluntario con id " + voluntarioId + " no encontrado"));
 
-        Inscription inscription = inscriptionRepository.findByVoluntarioIdAndProgramaVoluntariadoId(voluntarioId, programaId)
+        Inscription inscription = inscriptionRepository.findByVolunteerIdAndVolunteerProgramId(voluntarioId, programaId)
                 .orElseThrow(() -> new InscriptionNotFoundException("El voluntario con id " + voluntarioId + " no está inscrito en el programa con id " + programaId));
 
-        volunteer.removeInscripcion(programa);
+        volunteer.removeInscription(programa);
         inscriptionRepository.delete(inscription);
     }
 
@@ -128,11 +128,11 @@ public class VolunteerProgramService {
         Volunteer volunteer = volunteerRepository.findByEmail(username)
                 .orElseThrow(() -> new VolunteerNotFoundException("Voluntario con email " + username + " no encontrado"));
 
-        if(inscriptionRepository.findByVoluntarioIdAndProgramaVoluntariadoId(volunteer.getId(), programaId).isEmpty()){
+        if(inscriptionRepository.findByVolunteerIdAndVolunteerProgramId(volunteer.getId(), programaId).isEmpty()){
             throw new InscriptionNotFoundException("El voluntario con id " + volunteer.getId() + " no está inscrito en el programa con id " + programaId);
         }
 
-        volunteer.removeInscripcion(programa);
+        volunteer.removeInscription(programa);
         volunteerRepository.save(volunteer);
     }
 

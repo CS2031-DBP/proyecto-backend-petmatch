@@ -21,8 +21,8 @@ public class ShelterPresentationDTO {
             regexp = "^(\\+?51)?9\\d{8}$",
             message = "Los números válidos deben tener el formato: +519XXXXXXXX or 9XXXXXXXX)"
     )
-    private Long phone;
+    private String phone;
     @NonNull
     @NotEmpty
-    private Integer avaliableSpaces;
+    private Integer availableSpaces;
 }

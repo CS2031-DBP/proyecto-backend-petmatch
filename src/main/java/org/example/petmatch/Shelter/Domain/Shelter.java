@@ -15,7 +15,7 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "albergues")
+@Table(name = "shelters")
 @Builder
 public class Shelter {
 
@@ -42,19 +42,19 @@ public class Shelter {
     @Column(nullable = false, unique = true)
     private String email;
 
-    @OneToMany(mappedBy = "albergue", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "shelter", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Post> posts;
 
-    @OneToMany(mappedBy = "albergue", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<VolunteerProgram> programasVoluntariado;
+    @OneToMany(mappedBy = "shelter", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<VolunteerProgram> volunteerPrograms;
 
-    @OneToMany(mappedBy = "albergue")
-    private List<Animal> animales;
+    @OneToMany(mappedBy = "shelter")
+    private List<Animal> animals;
     // Metodo de reasignacion
 
     @ManyToMany
-    @JoinTable(name = "Albergue_seguidores", joinColumns = @JoinColumn(name = "albergue_id"), inverseJoinColumns = @JoinColumn(name = "user_id"))
-    private List<User> seguidores;
+    @JoinTable(name = "shelter_followers", joinColumns = @JoinColumn(name = "shelter_id"), inverseJoinColumns = @JoinColumn(name = "user_id"))
+    private List<User> followers;
 
 
     @Enumerated(EnumType.STRING)

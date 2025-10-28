@@ -28,7 +28,7 @@ public class Post {
     private String necessities;
 
     @ManyToOne
-    @JoinColumn(name = "albergue_id")
+    @JoinColumn(name = "shelter_id")
     private Shelter shelter;
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)

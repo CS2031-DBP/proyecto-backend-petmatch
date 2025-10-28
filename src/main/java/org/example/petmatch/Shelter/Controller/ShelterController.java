@@ -31,10 +31,8 @@ public class ShelterController {
 
     @GetMapping
     public ResponseEntity<List<ShelterPresentationDTO>> getAllAlbergues() {
-        List<Shelter> shelters = shelterService.findAll();
-        List<ShelterPresentationDTO> alberguedtos = shelters.stream()
-                .map(albergue -> modelMapper.map(albergue, ShelterPresentationDTO.class))
-                .toList();
+
+        List<ShelterPresentationDTO> alberguedtos = shelterService.findAll();
         return ResponseEntity.ok(alberguedtos);
     }
 
@@ -43,7 +41,7 @@ public class ShelterController {
             @RequestParam String location,
             @RequestParam(defaultValue = "5") double radiusKm) throws Exception {
 
-        List<Shelter> all = shelterService.findAll();
+        List<ShelterPresentationDTO> all = shelterService.findAll();
         var origin = googleMapsService.getCoordinates(location);
 
         List<ShelterPresentationDTO> nearby = all.stream()

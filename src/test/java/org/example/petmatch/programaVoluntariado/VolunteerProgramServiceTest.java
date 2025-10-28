@@ -59,15 +59,15 @@ public class VolunteerProgramServiceTest {
     private VolunteerProgram programa(Long id, String nombre, int necesarios, int inscritos, VolunteerProgramStatus status) {
         var p = new VolunteerProgram();
         p.setId(id);
-        p.setNombre(nombre);
-        p.setDescripcion("desc");
-        p.setFechaInicio(ZonedDateTime.now().minusDays(1));
-        p.setFechaFin(ZonedDateTime.now().plusDays(7));
-        p.setUbicacion("Lima");
-        p.setNumeroVoluntariosNecesarios(necesarios);
-        p.setNumeroVoluntariosInscritos(inscritos);
+        p.setName(nombre);
+        p.setDescription("desc");
+        p.setStartDate(ZonedDateTime.now().minusDays(1));
+        p.setFinishDate(ZonedDateTime.now().plusDays(7));
+        p.setLocation("Lima");
+        p.setNecessaryVolunteers(necesarios);
+        p.setEnrolledVolunteers(inscritos);
         p.setStatus(status);
-        p.setInscritos(new ArrayList<>());
+        p.setEnrolled(new ArrayList<>());
         return p;
     }
 
@@ -96,8 +96,8 @@ public class VolunteerProgramServiceTest {
 
         Inscription ins = new Inscription(v, p);
 
-        v.getInscripciones().add(ins);
-        p.getInscritos().add(ins);
+        v.getInscriptions().add(ins);
+        p.getEnrolled().add(ins);
 
         return ins;
     }
@@ -135,8 +135,8 @@ public class VolunteerProgramServiceTest {
         var v1 = voluntario(100L, "a@x.com");
         var v2 = voluntario(101L, "b@x.com");
 
-        v1.addInscripcion(p);
-        v2.addInscripcion(p);
+        v1.addInscription(p);
+        v2.addInscription(p);
 
         when(programaRepository.findById(10L)).thenReturn(Optional.of(p));
 
@@ -179,9 +179,9 @@ public class VolunteerProgramServiceTest {
 
         assertThat(out.getId()).isEqualTo(99L);
         verify(programaRepository).save(argThat(p ->
-                p.getNombre().equals("Vacunatón")
+                p.getName().equals("Vacunatón")
                         && p.getShelter().getId().equals(5L)
-                        && "Av. Siempre Viva 742".equals(p.getUbicacion())
+                        && "Av. Siempre Viva 742".equals(p.getLocation())
         ));
     }
 
@@ -203,7 +203,7 @@ public class VolunteerProgramServiceTest {
 
         when(programaRepository.findById(10L)).thenReturn(Optional.of(p));
         // Corregido: si NO está inscrito → existsBy... = false
-        when(inscriptionRepository.existsByVoluntarioIdAndProgramaVoluntariadoId(200L, 10L)).thenReturn(false);
+        when(inscriptionRepository.existsByVolunteerIdAndVolunteerProgramId(200L, 10L)).thenReturn(false);
         // Encontrar o crear voluntario: ya existe
         when(volunteerRepository.findById(200L)).thenReturn(Optional.of(v));
         when(inscriptionRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
@@ -211,7 +211,7 @@ public class VolunteerProgramServiceTest {
         service.enrollingVolunteerPrograma(10L, 200L);
 
         // addInscripcion debe haber incrementado a 2/2 y marcado LLENO
-        assertThat(p.getNumeroVoluntariosInscritos()).isEqualTo(2);
+        assertThat(p.getEnrolledVolunteers()).isEqualTo(2);
         assertThat(p.getStatus()).isEqualTo(VolunteerProgramStatus.LLENO);
         verify(inscriptionRepository).save(any(Inscription.class));
     }
@@ -221,7 +221,7 @@ public class VolunteerProgramServiceTest {
     void shouldThrowAlreadyEnrolledWhenInscripcionExists() {
         var p = programa(10L, "Rescate", 5, 1, VolunteerProgramStatus.ABIERTO);
         when(programaRepository.findById(10L)).thenReturn(Optional.of(p));
-        when(inscriptionRepository.existsByVoluntarioIdAndProgramaVoluntariadoId(200L, 10L))
+        when(inscriptionRepository.existsByVolunteerIdAndVolunteerProgramId(200L, 10L))
                 .thenReturn(true); // ya inscrito
 
         assertThrows(AlreadyEnrolledException.class,
@@ -234,7 +234,7 @@ public class VolunteerProgramServiceTest {
     void shouldThrowProgramaIsFullWhenProgramaIsAlreadyFull() {
         var p = programa(10L, "Rescate", 2, 2, VolunteerProgramStatus.LLENO);
         when(programaRepository.findById(10L)).thenReturn(Optional.of(p));
-        when(inscriptionRepository.existsByVoluntarioIdAndProgramaVoluntariadoId(200L, 10L))
+        when(inscriptionRepository.existsByVolunteerIdAndVolunteerProgramId(200L, 10L))
                 .thenReturn(false);
 
         assertThrows(VolunteerProgramIsFullException.class,
@@ -249,14 +249,14 @@ public class VolunteerProgramServiceTest {
         var v = voluntario(200L, "v@x.com");
 
         when(programaRepository.findById(10L)).thenReturn(Optional.of(p));
-        when(inscriptionRepository.existsByVoluntarioIdAndProgramaVoluntariadoId(200L, 10L))
+        when(inscriptionRepository.existsByVolunteerIdAndVolunteerProgramId(200L, 10L))
                 .thenReturn(false);
         when(volunteerRepository.findById(200L)).thenReturn(Optional.of(v));
         when(inscriptionRepository.save(any(Inscription.class))).thenAnswer(inv -> inv.getArgument(0));
 
         service.enrollingVolunteerPrograma(10L, 200L);
 
-        assertThat(p.getNumeroVoluntariosInscritos()).isEqualTo(2);
+        assertThat(p.getEnrolledVolunteers()).isEqualTo(2);
         assertThat(p.getStatus()).isEqualTo(VolunteerProgramStatus.LLENO);
         verify(inscriptionRepository).save(any(Inscription.class));
     }
@@ -305,7 +305,7 @@ public class VolunteerProgramServiceTest {
 
         when(programaRepository.findById(10L)).thenReturn(Optional.of(p));
         when(volunteerRepository.findById(200L)).thenReturn(Optional.of(v));
-        when(inscriptionRepository.findByVoluntarioIdAndProgramaVoluntariadoId(200L, 10L))
+        when(inscriptionRepository.findByVolunteerIdAndVolunteerProgramId(200L, 10L))
                 .thenReturn(Optional.of(ins));
 
         service.unsubscribeVolunteerProgram(10L, 200L);
@@ -321,7 +321,7 @@ public class VolunteerProgramServiceTest {
 
         when(programaRepository.findById(10L)).thenReturn(Optional.of(p));
         when(volunteerRepository.findById(200L)).thenReturn(Optional.of(v));
-        when(inscriptionRepository.findByVoluntarioIdAndProgramaVoluntariadoId(200L, 10L))
+        when(inscriptionRepository.findByVolunteerIdAndVolunteerProgramId(200L, 10L))
                 .thenReturn(Optional.empty());
 
         assertThrows(RuntimeException.class,
@@ -340,7 +340,7 @@ public class VolunteerProgramServiceTest {
         when(programaRepository.findById(10L)).thenReturn(Optional.of(p));
         when(shelterRepository.findByEmail("alb@x.com")).thenReturn(Optional.of(alb));
         when(volunteerRepository.findById(200L)).thenReturn(Optional.of(v));
-        when(inscriptionRepository.findByVoluntarioIdAndProgramaVoluntariadoId(200L, 10L))
+        when(inscriptionRepository.findByVolunteerIdAndVolunteerProgramId(200L, 10L))
                 .thenReturn(Optional.of(ins));
 
         service.unsubscribeVolunteerProgramOnShelter(10L, 200L, "alb@x.com");
@@ -373,7 +373,7 @@ public class VolunteerProgramServiceTest {
         when(programaRepository.findById(10L)).thenReturn(Optional.of(p));
         when(volunteerRepository.findByEmail("user@x.com")).thenReturn(Optional.of(v));
         // Corregido: (voluntarioId, programaId)
-        when(inscriptionRepository.findByVoluntarioIdAndProgramaVoluntariadoId(200L, 10L))
+        when(inscriptionRepository.findByVolunteerIdAndVolunteerProgramId(200L, 10L))
                 .thenReturn(Optional.of(ins));
 
         service.desinscribirDePrograma(10L, "user@x.com");
@@ -389,7 +389,7 @@ public class VolunteerProgramServiceTest {
 
         when(programaRepository.findById(10L)).thenReturn(Optional.of(p));
         when(volunteerRepository.findByEmail("user@x.com")).thenReturn(Optional.of(v));
-        when(inscriptionRepository.findByVoluntarioIdAndProgramaVoluntariadoId(200L, 10L))
+        when(inscriptionRepository.findByVolunteerIdAndVolunteerProgramId(200L, 10L))
                 .thenReturn(Optional.empty());
 
         assertThrows(InscriptionNotFoundException.class,

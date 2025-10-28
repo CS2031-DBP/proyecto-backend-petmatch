@@ -18,42 +18,42 @@ import java.util.Objects;
 @Getter
 @Setter
 @Entity
-@Table(name = "voluntarios")
+@Table(name = "volunteers")
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 public class Volunteer extends User {
-    @OneToMany(mappedBy = "voluntario", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    private List<Inscription> inscripciones = new ArrayList<>();
+    @OneToMany(mappedBy = "volunteer", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<Inscription> inscriptions = new ArrayList<>();
 
-    public List<VolunteerProgram> getProgramas(){
+    public List<VolunteerProgram> getPrograms(){
         List<VolunteerProgram> programas = new ArrayList<>();
-        for(Inscription inscription : inscripciones){
+        for(Inscription inscription : inscriptions){
             programas.add(inscription.getVolunteerProgram());
         }
         return programas;
     }
 
-    public void addInscripcion(VolunteerProgram programa){
+    public void addInscription(VolunteerProgram programa){
         Inscription inscription = new Inscription(this, programa);
-        inscripciones.add(inscription);
-        programa.getInscritos().add(inscription);
+        inscriptions.add(inscription);
+        programa.getEnrolled().add(inscription);
     }
 
 
-    public void removeInscripcion(VolunteerProgram programa){
-        for(Inscription inscription : inscripciones){
+    public void removeInscription(VolunteerProgram programa){
+        for(Inscription inscription : inscriptions){
             if(inscription.getVolunteer().equals(this) && Objects.equals(inscription.getVolunteerProgram().getId(), programa.getId())){
-                inscripciones.remove(inscription);
-                programa.getInscritos().remove(inscription);
+                inscriptions.remove(inscription);
+                programa.getEnrolled().remove(inscription);
                 inscription.setVolunteer(null);
                 inscription.setVolunteerProgram(null);
                 break;
             }
         }
-        if (programa.getNumeroVoluntariosInscritos() > 0) {
-            programa.setNumeroVoluntariosInscritos(programa.getNumeroVoluntariosInscritos() - 1);
+        if (programa.getEnrolledVolunteers() > 0) {
+            programa.setEnrolledVolunteers(programa.getEnrolledVolunteers() - 1);
         }
         if(programa.getStatus() == VolunteerProgramStatus.LLENO &&
-                programa.getNumeroVoluntariosInscritos() < programa.getNumeroVoluntariosNecesarios()){
+                programa.getEnrolledVolunteers() < programa.getNecessaryVolunteers()){
             programa.setStatus(VolunteerProgramStatus.ABIERTO);
         }
     }

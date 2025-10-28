@@ -53,13 +53,13 @@ public class ProgramaRepositoryTest {
 
     private VolunteerProgram programa(String nombre, int necesarios, VolunteerProgramStatus status) {
         VolunteerProgram p = new VolunteerProgram();
-        p.setNombre(nombre);
-        p.setDescripcion("desc " + nombre);
-        p.setFechaInicio(ZonedDateTime.now().minusDays(2));
-        p.setFechaFin(ZonedDateTime.now().plusDays(5));
-        p.setUbicacion("Lima");
-        p.setNumeroVoluntariosNecesarios(necesarios);
-        p.setNumeroVoluntariosInscritos(0);
+        p.setName(nombre);
+        p.setDescription("desc " + nombre);
+        p.setStartDate(ZonedDateTime.now().minusDays(2));
+        p.setFinishDate(ZonedDateTime.now().plusDays(5));
+        p.setLocation("Lima");
+        p.setNecessaryVolunteers(necesarios);
+        p.setEnrolledVolunteers(0);
         p.setStatus(status);
         return p;
     }
@@ -74,7 +74,7 @@ public class ProgramaRepositoryTest {
     }
 
     private void inscribir(Volunteer v, VolunteerProgram p) {
-        v.addInscripcion(p);
+        v.addInscription(p);
         em.persist(v);
         em.flush();
         em.clear();
@@ -89,8 +89,8 @@ public class ProgramaRepositoryTest {
         Optional<VolunteerProgram> found = programaRepo.findById(p.getId());
 
         assertThat(found).isPresent();
-        assertThat(found.get().getNombre()).isEqualTo("Rescate");
-        assertThat(found.get().getNumeroVoluntariosInscritos()).isZero();
+        assertThat(found.get().getName()).isEqualTo("Rescate");
+        assertThat(found.get().getEnrolledVolunteers()).isZero();
     }
 
     @Test
@@ -111,7 +111,7 @@ public class ProgramaRepositoryTest {
 
         var again = programaRepo.findById(p.getId()).orElseThrow();
         assertThat(again.getShelter().getEmail()).isEqualTo("alb@x.com");
-        assertThat(again.getUbicacion()).isEqualTo("Lima");
+        assertThat(again.getLocation()).isEqualTo("Lima");
     }
 
     @Test
@@ -128,7 +128,7 @@ public class ProgramaRepositoryTest {
 
         assertThat(reloaded.getVoluntarios()).extracting(Volunteer::getEmail)
                 .containsExactlyInAnyOrder("a@x.com", "b@x.com");
-        assertThat(reloaded.getNumeroVoluntariosInscritos()).isEqualTo(2);
+        assertThat(reloaded.getEnrolledVolunteers()).isEqualTo(2);
     }
 
     @Test
@@ -142,7 +142,7 @@ public class ProgramaRepositoryTest {
         inscribir(v2, p);
 
         var reloaded = programaRepo.findById(p.getId()).orElseThrow();
-        assertThat(reloaded.getNumeroVoluntariosInscritos()).isEqualTo(2);
+        assertThat(reloaded.getEnrolledVolunteers()).isEqualTo(2);
         assertThat(reloaded.getStatus()).isEqualTo(VolunteerProgramStatus.LLENO);
         assertThat(reloaded.isLleno()).isTrue();
     }
@@ -160,12 +160,12 @@ public class ProgramaRepositoryTest {
 
         var managedVol = em.find(Volunteer.class, v2.getId());
         var managedProg = em.find(VolunteerProgram.class, p.getId());
-        managedVol.removeInscripcion(managedProg);
+        managedVol.removeInscription(managedProg);
         em.flush();
         em.clear();
 
         var reloaded = programaRepo.findById(p.getId()).orElseThrow();
-        assertThat(reloaded.getNumeroVoluntariosInscritos()).isEqualTo(1);
+        assertThat(reloaded.getEnrolledVolunteers()).isEqualTo(1);
         assertThat(reloaded.getStatus()).isEqualTo(VolunteerProgramStatus.ABIERTO);
         assertThat(reloaded.getVoluntarios()).extracting(Volunteer::getEmail)
                 .containsExactly("v1@x.com");

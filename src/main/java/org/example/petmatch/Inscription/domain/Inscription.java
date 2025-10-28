@@ -22,16 +22,16 @@ import java.time.ZonedDateTime;
 public class Inscription {
 
     @EmbeddedId
-    private VolunteerProgramId id;
+    private InscriptionId id;
 
     @JoinColumn(nullable = false)
     @ManyToOne(fetch = FetchType.LAZY)
-    @MapsId("voluntarioId")
+    @MapsId("volunteerId")
     private Volunteer volunteer;
 
     @JoinColumn(nullable = false)
     @ManyToOne(fetch = FetchType.LAZY)
-    @MapsId("programaId")
+    @MapsId("programId")
     private VolunteerProgram volunteerProgram;
 
     private ZonedDateTime fechaInscripcion = ZonedDateTime.now();
@@ -39,6 +39,6 @@ public class Inscription {
     public Inscription(Volunteer volunteer, VolunteerProgram volunteerProgram) {
         this.volunteer = volunteer;
         this.volunteerProgram = volunteerProgram;
-        this.id = new VolunteerProgramId(volunteer.getId(), volunteerProgram.getId());
+        this.id = new InscriptionId(volunteer.getId(), volunteerProgram.getId());
     }
 }

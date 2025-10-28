@@ -12,6 +12,7 @@ import org.example.petmatch.Shelter.Domain.Shelter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Table(name = "animals")
 public class Animal {
 
     @Id
@@ -25,7 +26,7 @@ public class Animal {
     private String breed;
 
     @ManyToOne
-    @JoinColumn(name = "albergue_id")
+    @JoinColumn(name = "shelter_id")
     private Shelter shelter;
 
 }

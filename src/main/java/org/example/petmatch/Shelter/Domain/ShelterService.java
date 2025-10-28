@@ -3,6 +3,7 @@ package org.example.petmatch.Shelter.Domain;
 import org.example.petmatch.Shelter.DTO.Auth.ShelterAuthLoginRequestDto;
 import org.example.petmatch.Shelter.DTO.Auth.ShelterAuthResponseDto;
 import org.example.petmatch.Shelter.DTO.Auth.ShelterAuthRegisterRequestDto;
+import org.example.petmatch.Shelter.DTO.ShelterPresentationDTO;
 import org.example.petmatch.Shelter.Exceptions.ShelterAlreadyExistsException;
 import org.example.petmatch.Shelter.Exceptions.ShelterNotFoundException;
 import org.example.petmatch.Shelter.Infraestructure.ShelterRepository;
@@ -29,8 +30,9 @@ public class ShelterService {
     private final JwtService jwtService;
     private final PasswordEncoder passwordEncoder;
 
-    public List<Shelter> findAll(){
-        return shelterRepository.findAll();
+    public List<ShelterPresentationDTO> findAll(){
+        return shelterRepository.findAll().stream().map(albergue -> modelMapper.map(albergue, ShelterPresentationDTO.class))
+                .toList();
     }
 
 
