@@ -1,8 +1,6 @@
 # **PetMatch: Integración y apoyo en albergues para ayudar a los animales**
 **Curso:** Desarrollo Basado en Plataformas (CS 2031)  
 
-**Postman Collection:** [PostmanCollection](https://asd555-8170.postman.co/workspace/petmatch~a8e471f9-ed4f-4af2-aa04-8d6e9a733429/collection/43516792-bcb6e32d-31db-4ce8-aaa0-d2df52bfdbc0?action=share&creator=43516792&active-environment=43516792-ecbff733-47ce-4eb0-bbb8-2cf1f6e8cd2b)
-
 **Integrantes:**  
 - Valentín Tuesta Barrantes - 202410251  
 - Rayhan Matos Copello - 202410377  
@@ -151,10 +149,10 @@ Representa a los albergues registrados dentro de la plataforma. Cada refugio ges
 
 **Relaciones:**
 
-* `posts`: relación *uno a muchos* con `Post`.
-* `volunteerPrograms`: relación *uno a muchos* con `VolunteerProgram`.
-* `animals`: relación *uno a muchos* con `Animal`.
-* `followers`: relación *muchos a muchos* con `User`.
+* `posts`: relación *one to many* con `Post`.
+* `volunteerPrograms`: relación *one to many* con `VolunteerProgram`.
+* `animals`: relación *one to many* con `Animal`.
+* `followers`: relación *many to many* con `User`.
 
 #### **4.2.2 User**
 Representa a toda persona registrada en el sistema, incluyendo adoptantes, donantes, voluntarios o administradores.
@@ -188,8 +186,8 @@ Representa los programas de voluntariado organizados por los albergues para apoy
 
 **Relaciones:**
 
-* `shelter`: relación *muchos a uno* con `Shelter`.
-* `enrolled`: relación *uno a muchos* con `Inscription`.
+* `shelter`: relación *many to one* con `Shelter`.
+* `enrolled`: relación *one to many* con `Inscription`.
 
 Permite administrar las inscripciones y el estado del programa (por ejemplo, activo o lleno).
 
@@ -204,7 +202,7 @@ Representa a los animales bajo cuidado o disponibles para adopción.
 
 **Relaciones:**
 
-* `shelter`: relación *muchos a uno* con `Shelter`.
+* `shelter`: relación *many to one* con `Shelter`.
 
 Esta entidad es clave para registrar y gestionar la información de cada animal dentro del sistema.
 
@@ -214,47 +212,64 @@ Esta entidad es clave para registrar y gestionar la información de cada animal 
 
 ### **5.1 Niveles de Testing Realizados**
 
-Durante el desarrollo del sistema se implementaron diferentes niveles de prueba para asegurar la **calidad y estabilidad del software**:
+Durante el desarrollo de **PetMatch**, se realizaron diferentes niveles de pruebas con el objetivo de garantizar la **calidad, consistencia y correcto funcionamiento** de los módulos principales.
+Se aplicaron los siguientes tipos de testing:
 
 * **Pruebas Unitarias:**
-  Se validaron los métodos de servicios y utilidades de seguridad, como la generación y validación de tokens en `JwtService`, garantizando que las operaciones de autenticación funcionen correctamente.
+  Se ejecutaron sobre los repositorios de entidades como `Animal`, `Shelter`, `Post`, `User`, `Volunteer`, `Inscription` y `VolunteerProgram`.
+  Cada prueba verificó la correcta persistencia, búsqueda y eliminación de registros en la base de datos, así como la relación entre entidades (por ejemplo, entre `Animal` y `Shelter` o entre `Volunteer` y `VolunteerProgram`).
 
 * **Pruebas de Integración:**
-  Se probaron componentes del sistema en conjunto, como los controladores (`UserController`, `AlbergueController`) junto con los servicios (`UserService`, `AlbergueService`), utilizando `MockMvc` para simular peticiones HTTP.
-  Ejemplo: el test `UserControllerTest` valida el registro y autenticación de usuarios verificando códigos de estado y estructura del JSON devuelto.
+  Mediante el uso de **Spring Boot Test** y la anotación `@DataJpaTest`, se validó la interacción real con el contexto de persistencia y las configuraciones de JPA/Hibernate.
+  Estas pruebas aseguraron que las operaciones de los repositorios funcionaran correctamente en conjunto con la base de datos embebida.
 
 * **Pruebas de Sistema:**
-  Se realizaron pruebas de flujo completo en endpoints protegidos y públicos, comprobando el correcto funcionamiento de la seguridad JWT y la autorización de roles (`USER`, `ALBERGUE`).
+  Se comprobó el correcto flujo de información entre las capas del sistema (controladores, servicios, repositorios) y la autenticación mediante **JWT**, garantizando que las rutas protegidas exigieran credenciales válidas.
 
-* **Pruebas de Aceptación:**
-  Se verificó que las funcionalidades principales —como registro, login, y acceso a los programas de voluntariado— cumplan con los requerimientos esperados por el usuario final.
+* **Pruebas de Aceptación (manuales):**
+  Finalmente, se realizaron pruebas funcionales simulando el uso por parte de los distintos tipos de usuarios verificando el inicio de sesión, registro, y la visualización de programas y publicaciones.
 
 ### **5.2 Resultados**
 
-* Los endpoints públicos (`/user/auth/**`, `/albergues/auth/**`, `/albergues`, `/voluntarios`) respondieron correctamente sin necesidad de token.
-* Los endpoints protegidos solo permitieron el acceso con tokens JWT válidos, según el tipo de entidad (usuario o albergue).
-* Se detectaron y corrigieron errores relacionados con:
+Los resultados de las pruebas fueron satisfactorios.
+A continuación, se resumen los principales hallazgos y correcciones:
 
-  * **Autenticación inválida:** manejo de tokens expirados o manipulados.
-  * **Autorización incorrecta:** validación de roles dentro del filtro `JwtAuthorizationFilter`.
-  * **Errores de mapeo en DTOs:** ajustes en los campos devueltos por los controladores.
+* **Persistencia correcta de entidades:**
+  Se validó que entidades como `Animal`, `Post`, `Shelter` y `Inscription` se almacenaran adecuadamente y mantuvieran sus relaciones de clave foránea.
+  Ejemplo: En `AnimalRepositoryTest`, se verificó que al persistir un animal, la relación con su `Shelter` se mantuviera mediante `assertThat(managed.getShelter()).isNotNull()`.
 
-En todos los casos, los tests de controladores (`MockMvc`) retornaron los códigos de estado esperados (`200 OK`, `201 Created`, `403 Forbidden`, `401 Unauthorized`), confirmando la estabilidad del sistema.
+* **Búsqueda y validación de datos:**
+  Las pruebas confirmaron que los métodos personalizados (`findByName`, `findByEmail`, `existsByEmail`, etc.) devolvieran los resultados esperados o vacíos cuando correspondía.
+
+* **Eliminación controlada:**
+  En `ShelterRepositoryTest`, se comprobó que la eliminación por nombre (`deleteByName`) borrara el registro sin afectar otras entidades relacionadas.
+
+* **Integridad relacional:**
+  En `InscriptionRepositoryTest`, se confirmó que la relación entre `Volunteer` y `VolunteerProgram` se mantuviera correctamente, evitando duplicidades y garantizando la unicidad de inscripciones.
+
+* **Errores corregidos:**
+  Durante las primeras ejecuciones se detectaron errores menores, como nombres de campos inconsistentes o fallos por atributos `nullable` no declarados.
+  Estos fueron solucionados mediante el ajuste de anotaciones (`@Column(nullable = false)`, `@JoinColumn`, `@Builder`) y la actualización de los constructores de las entidades.
+
+En general, todas las pruebas unitarias pasaron con éxito tras la corrección de dichos detalles, confirmando la estabilidad del modelo de datos y la lógica de negocio.
 
 ### **5.3 Manejo de Errores**
 
-El sistema implementa un manejo de errores **centralizado** mediante excepciones personalizadas y validaciones globales:
+El sistema **PetMatch** implementa un manejo de errores global basado en excepciones controladas, con el fin de mantener mensajes consistentes y una buena experiencia de usuario.
 
-* **`JwtAuthorizationFilter`:**
-  Maneja errores de autenticación y validación de tokens JWT, evitando el acceso a rutas protegidas sin un token válido.
+**Principales medidas:**
 
-* **`UserDetailsServiceImpl` y `AlbergueDetailsServiceImpl`:**
-  Lanza `UsernameNotFoundException` cuando las credenciales no corresponden a un usuario o albergue registrado.
+* **Excepciones personalizadas:**
+  Se manejan errores comunes (como credenciales inválidas o recursos inexistentes) mediante excepciones lanzadas desde los servicios y controladas en capas superiores.
 
-* **Validaciones en Controladores:**
-  Se controlan errores de entrada (como datos incompletos o mal formateados) usando excepciones propias y respuestas JSON estandarizadas.
+* **Manejo centralizado con `@ControllerAdvice`:**
+  Los errores se capturan globalmente, devolviendo respuestas uniformes con código HTTP y mensaje descriptivo, sin exponer información sensible del sistema.
 
-El manejo centralizado de excepciones permite ofrecer mensajes **claros y consistentes al usuario**, mejorar la **seguridad** del sistema y facilitar la **depuración de errores** durante las pruebas.
+* **Validación a nivel de entidad:**
+  Anotaciones como `@Email`, `@Column(nullable = false)` y `@Enumerated` aseguran que los datos cumplan las restricciones antes de ser persistidos.
+
+* **Prevención de errores de autenticación:**
+  En la configuración de seguridad (`SecurityConfig`), los filtros `JwtAuthorizationFilter` y `CustomUserDetailsService` se encargan de interceptar solicitudes no autorizadas y lanzar errores controlados cuando el token es inválido o ha expirado.
 
 ---
 
@@ -321,12 +336,10 @@ El desarrollo de **PetMatch** permitió construir una plataforma funcional y seg
 Entre los principales logros alcanzados se encuentran:
 
 1. Implementación de un **sistema de autenticación seguro** mediante **JWT (JSON Web Tokens)**, que diferencia entre usuarios y albergues, garantizando la protección de datos y accesos.
-2. Modelado de las entidades principales —`User`, `Shelter`, `Animal` y `VolunteerProgram`— con una estructura relacional clara y eficiente.
+2. Modelado de las entidades principales (`User`, `Shelter`, `Animal` y `VolunteerProgram`) con una estructura relacional clara y eficiente.
 3. Integración de **Spring Security** para gestionar roles, permisos y rutas protegidas de forma controlada.
 4. Ejecución de **pruebas unitarias y de integración** que aseguraron la funcionalidad y estabilidad del sistema.
 5. Diseño de un flujo coherente de registro, autenticación y manejo de datos que mejora la experiencia tanto para usuarios como para albergues.
-
-En conjunto, el proyecto responde de manera efectiva a la **problemática del abandono animal en el Perú**, proporcionando una herramienta tecnológica que **promueve la adopción responsable y la participación ciudadana en programas de voluntariado**.
 
 ### **7.2 Aprendizajes Clave**
 
