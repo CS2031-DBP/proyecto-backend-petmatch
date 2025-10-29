@@ -55,7 +55,6 @@ public class Shelter {
 
     @OneToMany(mappedBy = "shelter")
     private List<Animal> animals;
-    // Metodo de reasignacion
 
     @ManyToMany
     @JoinTable(name = "shelter_followers", joinColumns = @JoinColumn(name = "shelter_id"), inverseJoinColumns = @JoinColumn(name = "user_id"))
