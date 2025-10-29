@@ -1,0 +1,558 @@
+{
+  "info": {
+    "name": "PetMatch API",
+    "description": "Colección completa de endpoints para PetMatch",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8080",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "User Register",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"usuario1\",\n  \"email\": \"usuario1@email.com\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/user/auth/register",
+              "host": ["{{base_url}}"],
+              "path": ["user", "auth", "register"]
+            }
+          }
+        },
+        {
+          "name": "User Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"usuario1\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/user/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["user", "auth", "login"]
+            }
+          }
+        },
+        {
+          "name": "Shelter Register",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Albergue1\",\n  \"email\": \"albergue1@email.com\",\n  \"password\": \"password123\",\n  \"address\": \"Av. Principal 123\",\n  \"phone\": 987654321\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/albergues/auth/register",
+              "host": ["{{base_url}}"],
+              "path": ["albergues", "auth", "register"]
+            }
+          }
+        },
+        {
+          "name": "Shelter Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"albergue1@email.com\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/albergues/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["albergues", "auth", "login"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Shelters",
+      "item": [
+        {
+          "name": "Get All Shelters",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/albergues",
+              "host": ["{{base_url}}"],
+              "path": ["albergues"]
+            }
+          }
+        },
+        {
+          "name": "Get Shelters Near",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/albergues/near/-12.0464/-77.0428",
+              "host": ["{{base_url}}"],
+              "path": ["albergues", "near", "-12.0464", "-77.0428"]
+            }
+          }
+        },
+        {
+          "name": "Delete Shelter",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/albergues/Albergue1",
+              "host": ["{{base_url}}"],
+              "path": ["albergues", "Albergue1"]
+            }
+          }
+        },
+        {
+          "name": "Update Available Seats",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/albergues/mascotas_registradas/10/Albergue1",
+              "host": ["{{base_url}}"],
+              "path": ["albergues", "mascotas_registradas", "10", "Albergue1"]
+            }
+          }
+        },
+        {
+          "name": "Update Address",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/albergues/actualizacion_address/Nueva Direccion 456/Albergue1",
+              "host": ["{{base_url}}"],
+              "path": ["albergues", "actualizacion_address", "Nueva Direccion 456", "Albergue1"]
+            }
+          }
+        },
+        {
+          "name": "Update Phone",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/albergues/actualizacion_telefono/999888777/Albergue1",
+              "host": ["{{base_url}}"],
+              "path": ["albergues", "actualizacion_telefono", "999888777", "Albergue1"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Animals",
+      "item": [
+        {
+          "name": "Create Report",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Firulais\",\n  \"species\": \"Perro\",\n  \"breed\": \"Mestizo\",\n  \"age\": 3,\n  \"description\": \"Perro encontrado en la calle\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/user/report",
+              "host": ["{{base_url}}"],
+              "path": ["user", "report"]
+            }
+          }
+        },
+        {
+          "name": "Assign Shelter to Animal",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/animales/Firulais/asignar/Albergue1",
+              "host": ["{{base_url}}"],
+              "path": ["animales", "Firulais", "asignar", "Albergue1"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Posts",
+      "item": [
+        {
+          "name": "Get All Posts",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/posts",
+              "host": ["{{base_url}}"],
+              "path": ["posts"]
+            }
+          }
+        },
+        {
+          "name": "Get Post by Title",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/posts/Post de Prueba",
+              "host": ["{{base_url}}"],
+              "path": ["posts", "Post de Prueba"]
+            }
+          }
+        },
+        {
+          "name": "Get Posts by Shelter",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/posts/albergue/Albergue1",
+              "host": ["{{base_url}}"],
+              "path": ["posts", "albergue", "Albergue1"]
+            }
+          }
+        },
+        {
+          "name": "Create Post",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Nuevo Post\",\n  \"content\": \"Contenido del post\",\n  \"imageUrl\": \"https://example.com/image.jpg\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/posts/Albergue1",
+              "host": ["{{base_url}}"],
+              "path": ["posts", "Albergue1"]
+            }
+          }
+        },
+        {
+          "name": "Delete Post",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/posts/delete/Post de Prueba",
+              "host": ["{{base_url}}"],
+              "path": ["posts", "delete", "Post de Prueba"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Comments",
+      "item": [
+        {
+          "name": "Get Comments by Username",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/comentarios/usuario1",
+              "host": ["{{base_url}}"],
+              "path": ["comentarios", "usuario1"]
+            }
+          }
+        },
+        {
+          "name": "Get Comments by Post",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/comentarios/by_post/Post de Prueba",
+              "host": ["{{base_url}}"],
+              "path": ["comentarios", "by_post", "Post de Prueba"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Volunteer Programs",
+      "item": [
+        {
+          "name": "Get All Programs",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/programas",
+              "host": ["{{base_url}}"],
+              "path": ["programas"]
+            }
+          }
+        },
+        {
+          "name": "Get Volunteers in Program",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/programas/1/voluntarios",
+              "host": ["{{base_url}}"],
+              "path": ["programas", "1", "voluntarios"]
+            }
+          }
+        },
+        {
+          "name": "Create Program",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Programa de Voluntariado\",\n  \"description\": \"Descripción del programa\",\n  \"startDate\": \"2025-11-01\",\n  \"endDate\": \"2025-12-31\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/programas",
+              "host": ["{{base_url}}"],
+              "path": ["programas"]
+            }
+          }
+        },
+        {
+          "name": "Enroll in Program",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/programas/1/inscripcion?voluntarioId=1",
+              "host": ["{{base_url}}"],
+              "path": ["programas", "1", "inscripcion"],
+              "query": [
+                {
+                  "key": "voluntarioId",
+                  "value": "1"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Unsubscribe from Program (User)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/programas/1/inscripcion?voluntarioId=1",
+              "host": ["{{base_url}}"],
+              "path": ["programas", "1", "inscripcion"],
+              "query": [
+                {
+                  "key": "voluntarioId",
+                  "value": "1"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Unsubscribe Volunteer (Shelter)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/programas/alberge/1?voluntarioId=1",
+              "host": ["{{base_url}}"],
+              "path": ["programas", "alberge", "1"],
+              "query": [
+                {
+                  "key": "voluntarioId",
+                  "value": "1"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Cancel Inscription (Authenticated)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/programas/1/insctipciones",
+              "host": ["{{base_url}}"],
+              "path": ["programas", "1", "insctipciones"]
+            }
+          }
+        },
+        {
+          "name": "Delete Program (Shelter)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/programas/albergue/1",
+              "host": ["{{base_url}}"],
+              "path": ["programas", "albergue", "1"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Volunteers",
+      "item": [
+        {
+          "name": "Get All Volunteers",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/voluntarios",
+              "host": ["{{base_url}}"],
+              "path": ["voluntarios"]
+            }
+          }
+        },
+        {
+          "name": "Get Programs by Volunteer",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/voluntarios/1/programas",
+              "host": ["{{base_url}}"],
+              "path": ["voluntarios", "1", "programas"]
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{token}}",
+        "type": "string"
+      }
+    ]
+  }
+}
