@@ -1,5 +1,6 @@
 package org.example.petmatch.user;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.example.petmatch.Animals.Domain.AnimalService;
 import org.example.petmatch.User.Controller.UserController;
 import org.example.petmatch.User.Dto.Request.UserLoginRequestDto;
 import org.example.petmatch.User.Dto.Request.UserRegisterRequestDto;
@@ -7,12 +8,15 @@ import org.example.petmatch.User.Dto.Response.UserAuthResponseDto;
 import org.example.petmatch.User.Exceptions.InvalidCredentialsException;
 import org.example.petmatch.User.Exceptions.UserAlreadyExistsException;
 import org.example.petmatch.User.Service.UserService;
+import org.example.petmatch.Security.JwtAuthorizationFilter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.FilterType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
@@ -22,7 +26,11 @@ import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@WebMvcTest(UserController.class)
+@WebMvcTest(controllers = UserController.class,
+        excludeFilters = @ComponentScan.Filter(
+                type = FilterType.ASSIGNABLE_TYPE,
+                classes = JwtAuthorizationFilter.class
+        ))
 @AutoConfigureMockMvc(addFilters = false)
 public class UserControllerTest {
 
@@ -34,6 +42,10 @@ public class UserControllerTest {
 
     @MockitoBean
     private UserService userService;
+
+    @MockitoBean
+    private AnimalService animalService;
+
 
     private UserRegisterRequestDto registerRequest;
     private UserLoginRequestDto loginRequest;
