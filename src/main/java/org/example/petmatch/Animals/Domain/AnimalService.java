@@ -24,7 +24,9 @@ public class AnimalService {
             throw new ValidationException("Debes enviar las características del animal");
         }
 
-        animalRepository.findByName(instanceAnimal.getName()).orElseThrow(() -> new ValidationException("El animal ya existe"));
+        if (animalRepository.findByName(instanceAnimal.getName()).isPresent()) {
+            throw new ValidationException("El animal ya existe");
+        }
 
         Animal animal = modelMapper.map(instanceAnimal, Animal.class);
         animalRepository.save(animal);
