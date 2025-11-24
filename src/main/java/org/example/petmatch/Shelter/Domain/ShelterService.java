@@ -50,17 +50,19 @@ public class ShelterService {
     }
 
 
+    @Transactional  // ← IMPORTANTE
     public void deleteAlberguebyName(String name) throws ValidationException {
         if (!StringUtils.hasText(name)) {
             throw new ValidationException("Name is required");
         }
-        var found = shelterRepository.findByName(name);
-        if (found == null) {
-            throw new ValidationException("No existe un albergue con ese nombre");
-        } else {
-            shelterRepository.deleteByName(name);
-        }
+
+        Shelter shelter = shelterRepository.findByName(name)
+                .orElseThrow(() -> new ValidationException("No existe un albergue con ese nombre"));
+
+        shelterRepository.delete(shelter);  // Usa delete() en lugar de deleteByName()
     }
+
+
     @Transactional
     public Shelter updateAvailableSeats(Integer nMascotas, String albergue_name) throws Exception{
         Shelter shelter = shelterRepository.findByName(albergue_name).orElseThrow(() -> new ShelterNotFoundException("No existe un albergue con ese nombre"));

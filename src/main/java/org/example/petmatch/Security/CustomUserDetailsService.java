@@ -45,7 +45,7 @@ public class CustomUserDetailsService implements UserDetailsService {
         if (shelterOpt.isPresent()) {
             Shelter shelter = shelterOpt.get();
             List<GrantedAuthority> authorities = new ArrayList<>();
-            authorities.add(new SimpleGrantedAuthority("ROLE_ALBERGUE"));
+            authorities.add(new SimpleGrantedAuthority("ROLE_ALBERGUE")); // ← Verificar esto
 
             return new org.springframework.security.core.userdetails.User(
                     shelter.getEmail(),
@@ -53,7 +53,6 @@ public class CustomUserDetailsService implements UserDetailsService {
                     authorities
             );
         }
-
 
         throw new UsernameNotFoundException("Usuario o albergue no encontrado con email: " + email);
     }
