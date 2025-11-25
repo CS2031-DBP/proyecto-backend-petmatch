@@ -24,12 +24,16 @@ public class PostService {
     private final PostRepository postRepository;
 
     public List<PostViewDTO> getALLPosts(){
-
         List<Post> posts = postRepository.findAll();
         return posts.stream()
-                .map(post -> modelMapper.map(post, PostViewDTO.class))
+                .map(post -> {
+                    PostViewDTO dto = modelMapper.map(post, PostViewDTO.class);
+                    dto.setShelterName(post.getShelter().getName());  // ← Agregar manualmente
+                    return dto;
+                })
                 .toList();
     }
+
     @Transactional
     public Post NewPost(String albergue_name, RequestPostDTO postDTO) throws ValidationException {
         if (postRepository.findByTitle(postDTO.getTitle()).isPresent()) {
