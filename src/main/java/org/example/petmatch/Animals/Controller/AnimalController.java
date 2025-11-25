@@ -5,10 +5,9 @@ import lombok.RequiredArgsConstructor;
 import org.example.petmatch.Animals.DTO.AnimalPresentationDTO;
 import org.example.petmatch.Animals.Domain.AnimalService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 
 @RestController
@@ -25,5 +24,11 @@ public class AnimalController {
 
         AnimalPresentationDTO updatedAnimal = animalService.assignShelterToAnimal(animalName, shelterName);
         return ResponseEntity.ok(updatedAnimal);
+    }
+
+    @GetMapping
+    public ResponseEntity<List<AnimalPresentationDTO>> getAllAnimalsNoRegistered() {
+        List<AnimalPresentationDTO> animals = animalService.getAllAnimalsNoRegistered();
+        return ResponseEntity.ok(animals);
     }
 }

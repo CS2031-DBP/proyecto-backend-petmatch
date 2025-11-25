@@ -10,6 +10,9 @@ import org.modelmapper.ModelMapper;
 import org.example.petmatch.Exception.ValidationException;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class AnimalService {
@@ -46,4 +49,13 @@ public class AnimalService {
     }
 
 
+    public List<AnimalPresentationDTO> getAllAnimalsNoRegistered() {
+        List<AnimalPresentationDTO> animals = new ArrayList<>();
+        animalRepository.findAll().forEach(animal -> {
+            if (!animal.getRegistered()) {
+                animals.add(modelMapper.map(animal, AnimalPresentationDTO.class));
+            }
+        });
+        return animals;
+    }
 }
