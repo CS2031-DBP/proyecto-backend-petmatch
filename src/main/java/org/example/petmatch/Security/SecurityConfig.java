@@ -67,10 +67,9 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/voluntarios").permitAll()
                         .requestMatchers(HttpMethod.GET, "/voluntarios/*/programas").permitAll()
 
-                        // Public posts (read-only)
+                        // ⭐ Public posts (read-only) - DEBEN IR ANTES
                         .requestMatchers(HttpMethod.GET, "/posts").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/posts/*").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/posts/albergue/*").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/posts/**").permitAll()  // Cambiar de /posts/* a /posts/**
 
                         // Public comments (read-only)
                         .requestMatchers(HttpMethod.GET, "/comentarios/*").permitAll()
@@ -86,19 +85,19 @@ public class SecurityConfig {
                         // ============ SHELTER ROLE ENDPOINTS ============
                         .requestMatchers(HttpMethod.DELETE, "/albergues/*").hasRole("ALBERGUE")
                         .requestMatchers(HttpMethod.PATCH, "/albergues/**").hasRole("ALBERGUE")
+
+                        // ⭐ Posts creation/deletion for ALBERGUE
                         .requestMatchers(HttpMethod.POST, "/posts/*").hasRole("ALBERGUE")
                         .requestMatchers(HttpMethod.DELETE, "/posts/delete/*").hasRole("ALBERGUE")
+
                         .requestMatchers(HttpMethod.DELETE, "/programas/albergue/*").hasRole("ALBERGUE")
                         .requestMatchers(HttpMethod.DELETE, "/programas/alberge/*").hasRole("ALBERGUE")
 
                         // ============ AUTHENTICATED ENDPOINTS ============
                         .requestMatchers(HttpMethod.POST, "/programas").authenticated()
                         .requestMatchers(HttpMethod.POST, "/programas/*/inscripcion").authenticated()
-                        .requestMatchers(HttpMethod.DELETE, "/programas/*/insctipciones").authenticated()
+                        .requestMatchers(HttpMethod.DELETE, "/programas/*/insctipciones").authenticated()  // Typo: insctipciones
                         .requestMatchers(HttpMethod.PATCH, "/animales/**").authenticated()
-
-                        // ============ ADMIN ONLY ============
-                        .requestMatchers(HttpMethod.DELETE, "/programas/*").hasRole("ADMIN")
 
                         // Everything else requires authentication
                         .anyRequest().authenticated()

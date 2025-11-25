@@ -10,8 +10,7 @@ import java.util.List;
 public class PostViewDTO {
 
     @NotNull
-    @NotNull
-    private Long title;
+    private String title;
 
     @NotNull
     @NotEmpty
@@ -19,6 +18,6 @@ public class PostViewDTO {
 
     @NotNull
     @NotEmpty
-    private String albergue_name;
+    private String shelterName;
 
 }
