@@ -32,30 +32,5 @@ public class Volunteer extends User {
         return programas;
     }
 
-    public void addInscription(VolunteerProgram programa){
-        Inscription inscription = new Inscription(this, programa);
-        inscriptions.add(inscription);
-        programa.getEnrolled().add(inscription);
-    }
-
-
-    public void removeInscription(VolunteerProgram programa){
-        for(Inscription inscription : inscriptions){
-            if(inscription.getVolunteer().equals(this) && Objects.equals(inscription.getVolunteerProgram().getId(), programa.getId())){
-                inscriptions.remove(inscription);
-                programa.getEnrolled().remove(inscription);
-                inscription.setVolunteer(null);
-                inscription.setVolunteerProgram(null);
-                break;
-            }
-        }
-        if (programa.getEnrolledVolunteers() > 0) {
-            programa.setEnrolledVolunteers(programa.getEnrolledVolunteers() - 1);
-        }
-        if(programa.getStatus() == VolunteerProgramStatus.LLENO &&
-                programa.getEnrolledVolunteers() < programa.getNecessaryVolunteers()){
-            programa.setStatus(VolunteerProgramStatus.ABIERTO);
-        }
-    }
 
 }

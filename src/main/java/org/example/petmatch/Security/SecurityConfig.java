@@ -78,14 +78,14 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/animales").hasRole("ALBERGUE")
                         .requestMatchers(HttpMethod.PATCH, "/animales/**").hasRole("ALBERGUE")
 
+                        .requestMatchers(HttpMethod.DELETE, "/programas/albergue/*").hasRole("ALBERGUE")
+                        .requestMatchers(HttpMethod.DELETE, "/programas/albergue/*/inscripcion").hasRole("ALBERGUE")
+
+
                         // ============ AUTHENTICATED ENDPOINTS ============
                         .requestMatchers(HttpMethod.POST, "/programas").authenticated()
                         .requestMatchers(HttpMethod.POST, "/programas/*/inscripcion").authenticated()
                         .requestMatchers(HttpMethod.DELETE, "/programas/*/inscripciones").authenticated()
-
-                        // ============ ADMIN ONLY ============
-                        .requestMatchers(HttpMethod.DELETE, "/programas/*").hasRole("ADMIN")
-
                         // Everything else requires authentication
                         .anyRequest().authenticated()
                 )

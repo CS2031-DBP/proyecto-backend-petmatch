@@ -11,6 +11,8 @@ import org.example.petmatch.User.Dto.Response.UserAuthResponseDto;
 import org.example.petmatch.User.Exceptions.InvalidCredentialsException;
 import org.example.petmatch.User.Exceptions.UserAlreadyExistsException;
 import org.example.petmatch.User.Infraestructure.UserRepository;
+import org.example.petmatch.Volunteer.Domain.Volunteer;
+import org.example.petmatch.Volunteer.Infraestructure.VolunteerRepository;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -23,6 +25,7 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final VolunteerRepository volunteerRepository;
     private final JwtService jwtService;
     private final ModelMapper modelMapper;
     private final EmailService emailService;
@@ -33,18 +36,28 @@ public class UserService {
             throw new UserAlreadyExistsException("El usuario con email " + request.getEmail() + " ya existe");
         }
 
-        User user = modelMapper.map(request, User.class);
-        user.setPassword(passwordEncoder.encode(request.getPassword()));
-        user.setRole(Role.USER);
+        // ✅ CAMBIADO: Crear Volunteer en lugar de User
+        // Como Volunteer extends User, esto creará registros en AMBAS tablas
+        Volunteer volunteer = new Volunteer();
+        volunteer.setName(request.getName());
+        volunteer.setLastname(request.getLastname());
+        volunteer.setEmail(request.getEmail());
+        volunteer.setPassword(passwordEncoder.encode(request.getPassword()));
+        volunteer.setRole(Role.USER);
 
-        userRepository.save(user);
+        // Esto creará el registro en la tabla 'users' Y en la tabla 'volunteers'
+        volunteerRepository.save(volunteer);
 
-        String token = jwtService.generateToken(user.getEmail(), "USER");
+        String token = jwtService.generateToken(volunteer.getEmail(), "USER");
 
-        emailService.sendWelcomeEmailUser(user.getEmail(), user.getName());
+        emailService.sendWelcomeEmailUser(volunteer.getEmail(), volunteer.getName());
 
-        UserAuthResponseDto responseDto = modelMapper.map(user,UserAuthResponseDto.class);
-        responseDto.setRole(user.getRole().toString());
+        UserAuthResponseDto responseDto = new UserAuthResponseDto();
+        responseDto.setId(volunteer.getId());
+        responseDto.setName(volunteer.getName());
+        responseDto.setLastname(volunteer.getLastname());
+        responseDto.setEmail(volunteer.getEmail());
+        responseDto.setRole(volunteer.getRole().toString());
         responseDto.setAccessToken(token);
 
         return responseDto;

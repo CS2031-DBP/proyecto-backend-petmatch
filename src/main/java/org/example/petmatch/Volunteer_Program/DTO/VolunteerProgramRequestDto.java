@@ -5,35 +5,34 @@ import jakarta.validation.constraints.*;
 import lombok.Data;
 
 import java.time.ZonedDateTime;
-
 @Data
 public class VolunteerProgramRequestDto {
     @NotEmpty
     @Size(min = 3, max = 100, message = "El nombre debe tener entre 3 y 100 caracteres")
-    private String nombre;
+    private String name; // ✅ CAMBIADO de "nombre" a "name"
 
     @NotEmpty
     @Size(min = 10, max = 1000, message = "La descripcion debe tener entre 10 y 1000 caracteres")
-    private String descripcion;
+    private String description; // ✅ CAMBIADO de "descripcion" a "description"
 
     @Future
     @NotNull
-    private ZonedDateTime fechaInicio;
+    private ZonedDateTime startDate; // ✅ CAMBIADO de "fechaInicio" a "startDate"
 
     @NotNull
     @Future
-    private ZonedDateTime fechaFin;
+    private ZonedDateTime finishDate; // ✅ CAMBIADO de "fechaFin" a "finishDate"
 
     @NotNull
     @Max(100)
     @Min(1)
-    private Integer numeroVoluntariosNecesarios;
+    private Integer necessaryVolunteers; // ✅ CAMBIADO de "numeroVoluntariosNecesarios"
 
-    @AssertTrue
-    public boolean isFechaFinAfterFechaInicio() {
-        if (fechaInicio == null || fechaFin == null) {
+    @AssertTrue(message = "La fecha de fin debe ser posterior a la fecha de inicio")
+    public boolean isFinishDateAfterStartDate() {
+        if (startDate == null || finishDate == null) {
             return true;
         }
-        return fechaFin.isAfter(fechaInicio);
+        return finishDate.isAfter(startDate);
     }
 }

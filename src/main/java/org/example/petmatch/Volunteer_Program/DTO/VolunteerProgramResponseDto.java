@@ -11,12 +11,14 @@ import java.time.ZonedDateTime;
 @Data
 public class VolunteerProgramResponseDto {
     private Long id;
-    private String nombre;
-    private String descripcion;
-    private ZonedDateTime fechaInicio;
-    private ZonedDateTime fechaFin;
-    private String ubicacion;
-    private Integer numeroVoluntariosNecesarios;
-    private Integer numeroVoluntariosInscritos;
+    private String name; // ✅ CAMBIADO
+    private String description; // ✅ CAMBIADO
+    private ZonedDateTime startDate; // ✅ CAMBIADO
+    private ZonedDateTime finishDate; // ✅ CAMBIADO
+    private String location; // ✅ CAMBIADO de "ubicacion"
+    private Integer necessaryVolunteers; // ✅ CAMBIADO
+    private Integer enrolledVolunteers; // ✅ CAMBIADO de "numeroVoluntariosInscritos"
     private String status;
+    private Long shelterId; // ✅ AGREGADO - útil para el frontend
+    private String shelterName; // ✅ AGREGADO - útil para el frontend
 }

@@ -9,6 +9,7 @@ import org.example.petmatch.Inscription.domain.Inscription;
 import org.example.petmatch.Inscription.exception.AlreadyEnrolledException;
 import org.example.petmatch.Inscription.exception.InscriptionNotFoundException;
 import org.example.petmatch.Inscription.infrastructure.InscriptionRepository;
+import org.example.petmatch.User.Domain.User;
 import org.example.petmatch.Volunteer_Program.DTO.VolunteerProgramRequestDto;
 import org.example.petmatch.Volunteer_Program.DTO.VolunteerProgramResponseDto;
 import org.example.petmatch.Volunteer_Program.Infraestructure.VolunteerProgramRepository;
@@ -32,140 +33,163 @@ public class VolunteerProgramService {
     private final ModelMapper modelMapper;
     private final ShelterRepository shelterRepository;
     private final VolunteerRepository volunteerRepository;
-    private final UserRepository userRepository;
     private final InscriptionRepository inscriptionRepository;
 
     public List<VolunteerProgramResponseDto> getAllProgramas() {
         List<VolunteerProgram> programas = programaRepository.findAll();
-        List<VolunteerProgramResponseDto> programasDtos = programas.stream()
+        return programas.stream()
                 .map(programa -> modelMapper.map(programa, VolunteerProgramResponseDto.class))
                 .toList();
-        return programasDtos;
     }
 
     public List<VolunteerResponseDto> getAllVoluntariosInPrograma(Long id) {
-        VolunteerProgram programa = programaRepository.findById(id).orElseThrow(() -> new VolunteerProgramNotFoundException("Programa de voluntariado con id" + id + " no encontrado"));
+        VolunteerProgram programa = programaRepository.findById(id)
+                .orElseThrow(() -> new VolunteerProgramNotFoundException("Programa con id " + id + " no encontrado"));
+
         List<Volunteer> volunteers = programa.getVoluntarios();
-        List<VolunteerResponseDto> usuarios = volunteers.stream()
+        return volunteers.stream()
                 .map(voluntario -> modelMapper.map(voluntario, VolunteerResponseDto.class))
                 .toList();
-        return usuarios;
     }
 
-    public NewIdDTO createPrograma(String email, VolunteerProgramRequestDto programaResponseDto) {
-        Shelter shelterUser = shelterRepository.findByEmail(email).orElseThrow(() -> new ShelterNotFoundException("Albergue con email " + email + " no encontrado"));
-        Long AlbergueId = shelterUser.getId();
-        VolunteerProgram programa = modelMapper.map(programaResponseDto, VolunteerProgram.class);
-        Shelter shelter = shelterRepository.findById(AlbergueId).orElseThrow(() -> new RuntimeException("Albergue con id " + AlbergueId + " no encontrado"));
+    @Transactional
+    public NewIdDTO createPrograma(String email, VolunteerProgramRequestDto programaDto) {
+        Shelter shelter = shelterRepository.findByEmail(email)
+                .orElseThrow(() -> new ShelterNotFoundException("Albergue con email " + email + " no encontrado"));
+
+        VolunteerProgram programa = modelMapper.map(programaDto, VolunteerProgram.class);
         programa.setShelter(shelter);
         programa.setLocation(shelter.getAddress());
+        programa.setStatus(VolunteerProgramStatus.ABIERTO);
+        programa.setEnrolledVolunteers(0);
+
         VolunteerProgram savedPrograma = programaRepository.save(programa);
         return new NewIdDTO(savedPrograma.getId());
     }
 
+    // ✅ MÉTODO CORREGIDO - Inscribir voluntario a programa
     @Transactional
-    public void enrollingVolunteerPrograma(Long programaId, Long voluntarioId) {
-
+    public void enrollingVolunteerPrograma(Long programaId, String email) {
+        // 1️⃣ Buscar el programa
         VolunteerProgram programa = programaRepository.findById(programaId)
-                .orElseThrow(() -> new VolunteerProgramNotFoundException("Programa de voluntariado con id " + programaId + " no encontrado"));
-        if(inscriptionRepository.existsByVolunteerIdAndVolunteerProgramId(voluntarioId, programaId)) {
-            throw new AlreadyEnrolledException("El voluntario con id " + voluntarioId + " ya está inscrito en el programa con id " + programaId);
-        }
-        if(programa.isLleno()){
-            throw new VolunteerProgramIsFullException("El programa con id " + programaId + " ya ha alcanzado el número máximo de voluntarios");
+                .orElseThrow(() -> new VolunteerProgramNotFoundException("Programa con id " + programaId + " no encontrado"));
+
+        // 2️⃣ Buscar el voluntario (todos los usuarios son voluntarios automáticamente)
+        Volunteer volunteer = volunteerRepository.findByEmail(email)
+                .orElseThrow(() -> new VolunteerNotFoundException("Voluntario con email " + email + " no encontrado"));
+
+        // 3️⃣ Verificar si ya está inscrito
+        if(inscriptionRepository.existsByVolunteerIdAndVolunteerProgramId(volunteer.getId(), programaId)) {
+            throw new AlreadyEnrolledException("Ya estás inscrito en este programa");
         }
 
-        Integer numInscritos = programa.getEnrolledVolunteers();
-        programa.setEnrolledVolunteers(numInscritos + 1);
-        if(numInscritos + 1 >= programa.getNecessaryVolunteers()){
-            programa.setStatus(VolunteerProgramStatus.LLENO);
+        // 4️⃣ Verificar si el programa está lleno
+        if(programa.isLleno()){
+            throw new VolunteerProgramIsFullException("El programa está lleno");
         }
-        Volunteer volunteer = encontrarOCrearVoluntario(voluntarioId);
-        volunteer.addInscription(programa);
+
+        // 5️⃣ Crear la inscripción (SOLO UNA VEZ)
         Inscription inscription = new Inscription(volunteer, programa);
         inscriptionRepository.save(inscription);
+
+        // 6️⃣ Actualizar el contador de voluntarios inscritos
+        programa.setEnrolledVolunteers(programa.getEnrolledVolunteers() + 1);
+
+        // 7️⃣ Cambiar el estado si se alcanzó el límite
+        if(programa.getEnrolledVolunteers() >= programa.getNecessaryVolunteers()){
+            programa.setStatus(VolunteerProgramStatus.LLENO);
+        }
+
+        // 8️⃣ Guardar el programa con los cambios
+        programaRepository.save(programa);
     }
 
-    @Transactional
-    public void unsubscribeVolunteerProgram(Long programaId, Long voluntarioId) {
-        VolunteerProgram programa = programaRepository.findById(programaId)
-                .orElseThrow(() -> new VolunteerProgramNotFoundException("Programa de voluntariado con id " + programaId + " no encontrado"));
-        Volunteer volunteer = volunteerRepository.findById(voluntarioId)
-                .orElseThrow(() -> new VolunteerNotFoundException("Voluntario con id " + voluntarioId + " no encontrado"));
-        Inscription inscription = inscriptionRepository.findByVolunteerIdAndVolunteerProgramId(voluntarioId, programaId)
-                .orElseThrow(() -> new RuntimeException("El voluntario con id " + voluntarioId + " no está inscrito en el programa con id " + programaId));
-        volunteer.removeInscription(programa);
-        inscriptionRepository.delete(inscription);
-    }
-
+    // ✅ MÉTODO CORREGIDO - Albergue elimina un voluntario del programa
     @Transactional
     public void unsubscribeVolunteerProgramOnShelter(Long programaId, Long voluntarioId, String albergueEmail){
+        // 1️⃣ Buscar el programa
         VolunteerProgram programa = programaRepository.findById(programaId)
-                .orElseThrow(() -> new VolunteerProgramNotFoundException("Programa de voluntariado con id " + programaId + " no encontrado"));
+                .orElseThrow(() -> new VolunteerProgramNotFoundException("Programa con id " + programaId + " no encontrado"));
 
+        // 2️⃣ Verificar que el albergue sea el dueño del programa
         Shelter shelter = shelterRepository.findByEmail(albergueEmail)
                 .orElseThrow(() -> new ShelterNotFoundException("Albergue con email " + albergueEmail + " no encontrado"));
 
         if(!programa.getShelter().getId().equals(shelter.getId())){
-            throw new RuntimeException("El albergue con email " + albergueEmail + " no es el creador del programa con id " + programaId);
+            throw new RuntimeException("No tienes permiso para modificar este programa");
         }
 
+        // 3️⃣ Verificar que el voluntario existe
         Volunteer volunteer = volunteerRepository.findById(voluntarioId)
                 .orElseThrow(() -> new VolunteerNotFoundException("Voluntario con id " + voluntarioId + " no encontrado"));
 
+        // 4️⃣ Buscar la inscripción
         Inscription inscription = inscriptionRepository.findByVolunteerIdAndVolunteerProgramId(voluntarioId, programaId)
-                .orElseThrow(() -> new InscriptionNotFoundException("El voluntario con id " + voluntarioId + " no está inscrito en el programa con id " + programaId));
+                .orElseThrow(() -> new InscriptionNotFoundException("El voluntario no está inscrito en este programa"));
 
-        volunteer.removeInscription(programa);
+        // 5️⃣ Eliminar la inscripción
         inscriptionRepository.delete(inscription);
+
+        // 6️⃣ Actualizar el contador (sin bajar de 0)
+        programa.setEnrolledVolunteers(Math.max(0, programa.getEnrolledVolunteers() - 1));
+
+        // 7️⃣ Si estaba lleno y ahora hay espacio, cambiar estado a ABIERTO
+        if(programa.getStatus() == VolunteerProgramStatus.LLENO &&
+                programa.getEnrolledVolunteers() < programa.getNecessaryVolunteers()){
+            programa.setStatus(VolunteerProgramStatus.ABIERTO);
+        }
+
+        // 8️⃣ Guardar cambios
+        programaRepository.save(programa);
     }
 
+    // ✅ MÉTODO CORREGIDO - Voluntario se desinscribe del programa
     @Transactional
-    public void desinscribirDePrograma(Long programaId, String username) {
+    public void desinscribirDePrograma(Long programaId, String email) {
+        // 1️⃣ Buscar el programa
         VolunteerProgram programa = programaRepository.findById(programaId)
-                .orElseThrow(() -> new VolunteerProgramNotFoundException("Programa de voluntariado con id " + programaId + " no encontrado"));
+                .orElseThrow(() -> new VolunteerProgramNotFoundException("Programa con id " + programaId + " no encontrado"));
 
-        Volunteer volunteer = volunteerRepository.findByEmail(username)
-                .orElseThrow(() -> new VolunteerNotFoundException("Voluntario con email " + username + " no encontrado"));
+        // 2️⃣ Buscar el voluntario
+        Volunteer volunteer = volunteerRepository.findByEmail(email)
+                .orElseThrow(() -> new VolunteerNotFoundException("Voluntario con email " + email + " no encontrado"));
 
-        if(inscriptionRepository.findByVolunteerIdAndVolunteerProgramId(volunteer.getId(), programaId).isEmpty()){
-            throw new InscriptionNotFoundException("El voluntario con id " + volunteer.getId() + " no está inscrito en el programa con id " + programaId);
+        // 3️⃣ Buscar la inscripción
+        Inscription inscription = inscriptionRepository.findByVolunteerIdAndVolunteerProgramId(volunteer.getId(), programaId)
+                .orElseThrow(() -> new InscriptionNotFoundException("No estás inscrito en este programa"));
+
+        // 4️⃣ Eliminar la inscripción
+        inscriptionRepository.delete(inscription);
+
+        // 5️⃣ Actualizar el contador
+        programa.setEnrolledVolunteers(Math.max(0, programa.getEnrolledVolunteers() - 1));
+
+        // 6️⃣ Si estaba lleno y ahora hay espacio, cambiar estado
+        if(programa.getStatus() == VolunteerProgramStatus.LLENO &&
+                programa.getEnrolledVolunteers() < programa.getNecessaryVolunteers()){
+            programa.setStatus(VolunteerProgramStatus.ABIERTO);
         }
 
-        volunteer.removeInscription(programa);
-        volunteerRepository.save(volunteer);
+        // 7️⃣ Guardar cambios
+        programaRepository.save(programa);
     }
 
-    public void deletePrograma(Long id) {
-        if (!programaRepository.existsById(id)) {
-            throw new VolunteerProgramNotFoundException("Programa de voluntariado con id " + id + " no encontrado");
-        }
-        programaRepository.deleteById(id);
-    }
-
-    public Volunteer encontrarOCrearVoluntario(Long usuarioId) {
-        return volunteerRepository.findById(usuarioId).orElseGet(() -> {
-            if (!userRepository.existsById(usuarioId)) {
-                throw new RuntimeException("Usuario con id " + usuarioId + " no encontrado");
-            }
-            Volunteer nuevoVolunteer = new Volunteer();
-            nuevoVolunteer.setId(usuarioId);
-            return volunteerRepository.save(nuevoVolunteer);
-        });
-
-    }
-
+    // ✅ MÉTODO CORREGIDO - Albergue elimina su programa
+    @Transactional
     public void albergueDeletePrograma(Long id, String albergueEmail) {
+        // 1️⃣ Buscar el programa
         VolunteerProgram programa = programaRepository.findById(id)
-                .orElseThrow(() -> new VolunteerProgramNotFoundException("Programa de voluntariado con id " + id + " no encontrado"));
+                .orElseThrow(() -> new VolunteerProgramNotFoundException("Programa con id " + id + " no encontrado"));
 
+        // 2️⃣ Verificar que el albergue sea el dueño
         Shelter shelter = shelterRepository.findByEmail(albergueEmail)
                 .orElseThrow(() -> new ShelterNotFoundException("Albergue con email " + albergueEmail + " no encontrado"));
 
         if(!programa.getShelter().getId().equals(shelter.getId())){
-            throw new RuntimeException("El albergue con email " + albergueEmail + " no es el creador del programa con id " + id);
+            throw new RuntimeException("No tienes permiso para eliminar este programa");
         }
 
+        // 3️⃣ Eliminar el programa (las inscripciones se eliminan automáticamente por orphanRemoval)
         programaRepository.deleteById(id);
     }
 }
