@@ -1,5 +1,6 @@
 package org.example.petmatch.Post.Controller;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.example.petmatch.Common.NewIdDTO;
 import org.example.petmatch.Exception.ValidationException;
@@ -18,7 +19,6 @@ import java.util.List;
 public class PostController {
 
     private final PostService postService;
-
     @GetMapping
     public ResponseEntity<List<PostViewDTO>> getAllThePosts(){
         List<PostViewDTO> posts = postService.getALLPosts();

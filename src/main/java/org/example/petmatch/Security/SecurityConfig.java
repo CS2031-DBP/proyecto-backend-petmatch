@@ -54,30 +54,16 @@ public class SecurityConfig {
                 .cors(Customizer.withDefaults())
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        // ============ PUBLIC ENDPOINTS (NO AUTH) ============
-                        // Auth endpoints
                         .requestMatchers("/user/auth/register", "/user/auth/login").permitAll()
                         .requestMatchers("/albergues/auth/register", "/albergues/auth/login").permitAll()
-
-                        // Public shelter info
                         .requestMatchers(HttpMethod.GET, "/albergues").permitAll()
                         .requestMatchers(HttpMethod.GET, "/albergues/near/**").permitAll()
-
-                        // Public volunteer info
-                        .requestMatchers(HttpMethod.GET, "/voluntarios").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/voluntarios/*/programas").permitAll()
-
-                        // ⭐ Public posts (read-only) - DEBEN IR ANTES
                         .requestMatchers(HttpMethod.GET, "/posts").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/posts/**").permitAll()  // Cambiar de /posts/* a /posts/**
-
-                        // Public comments (read-only)
+                        .requestMatchers(HttpMethod.GET, "/posts/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/comentarios/*").permitAll()
                         .requestMatchers(HttpMethod.GET, "/comentarios/by_post/*").permitAll()
-
-                        // Public programs (read-only)
                         .requestMatchers(HttpMethod.GET, "/programas").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/programas/*/voluntarios").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/voluntarios").permitAll()
 
                         // ============ USER ROLE ENDPOINTS ============
                         .requestMatchers("/user/**").hasRole("USER")
@@ -85,19 +71,20 @@ public class SecurityConfig {
                         // ============ SHELTER ROLE ENDPOINTS ============
                         .requestMatchers(HttpMethod.DELETE, "/albergues/*").hasRole("ALBERGUE")
                         .requestMatchers(HttpMethod.PATCH, "/albergues/**").hasRole("ALBERGUE")
-
-                        // ⭐ Posts creation/deletion for ALBERGUE
                         .requestMatchers(HttpMethod.POST, "/posts/*").hasRole("ALBERGUE")
                         .requestMatchers(HttpMethod.DELETE, "/posts/delete/*").hasRole("ALBERGUE")
 
-                        .requestMatchers(HttpMethod.DELETE, "/programas/albergue/*").hasRole("ALBERGUE")
-                        .requestMatchers(HttpMethod.DELETE, "/programas/alberge/*").hasRole("ALBERGUE")
+                        // ⭐ Animals - SOLO ALBERGUE puede ver y asignar
+                        .requestMatchers(HttpMethod.GET, "/animales").hasRole("ALBERGUE")
+                        .requestMatchers(HttpMethod.PATCH, "/animales/**").hasRole("ALBERGUE")
 
                         // ============ AUTHENTICATED ENDPOINTS ============
                         .requestMatchers(HttpMethod.POST, "/programas").authenticated()
                         .requestMatchers(HttpMethod.POST, "/programas/*/inscripcion").authenticated()
-                        .requestMatchers(HttpMethod.DELETE, "/programas/*/insctipciones").authenticated()  // Typo: insctipciones
-                        .requestMatchers(HttpMethod.PATCH, "/animales/**").authenticated()
+                        .requestMatchers(HttpMethod.DELETE, "/programas/*/inscripciones").authenticated()
+
+                        // ============ ADMIN ONLY ============
+                        .requestMatchers(HttpMethod.DELETE, "/programas/*").hasRole("ADMIN")
 
                         // Everything else requires authentication
                         .anyRequest().authenticated()

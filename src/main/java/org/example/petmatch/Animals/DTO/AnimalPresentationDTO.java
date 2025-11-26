@@ -7,6 +7,8 @@ import lombok.Data;
 @Data
 public class AnimalPresentationDTO {
 
+    private Long id;
+
     @NotNull
     @NotEmpty
     private String name;
@@ -22,4 +24,5 @@ public class AnimalPresentationDTO {
     @NotNull
     private Boolean registered;
 
+    private String shelterName;
 }
