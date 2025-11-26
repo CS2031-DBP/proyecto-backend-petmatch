@@ -1,0 +1,580 @@
+{
+  "info": {
+    "name": "PetMatch API",
+    "description": "# PetMatch API - Documentación Completa\n\n## Descripción del Proyecto\nPetMatch es una plataforma que conecta albergues de animales con usuarios interesados en adopción y voluntariado. La API permite gestionar:\n- Registro y autenticación de usuarios y albergues\n- Gestión de animales reportados y en adopción\n- Publicaciones sobre mascotas\n- Programas de voluntariado\n- Sistema de comentarios\n\n## Autenticación\nLa API utiliza JWT (JSON Web Tokens) para autenticación. Después de hacer login o registro, se recibe un token que debe incluirse en el header `Authorization: Bearer {token}` para endpoints protegidos.\n\n### Roles:\n- **USER**: Usuario regular que puede reportar animales, inscribirse en programas de voluntariado\n- **ALBERGUE**: Albergue que puede gestionar sus publicaciones, programas y animales\n\n## Variables de Entorno\n- `base_url`: URL base del servidor (ej: http://localhost:8080)\n- `token`: Token JWT obtenido después de autenticación\n\n## Flujo de Uso Recomendado\n1. Registrar/Login como Usuario o Albergue\n2. Guardar el token recibido en la variable `{{token}}`\n3. Usar endpoints según el rol correspondiente",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "version": "1.0.0"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8080",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "item": [
+    {
+      "name": "Authentication",
+      "description": "Endpoints de autenticación para usuarios y albergues. Generan tokens JWT necesarios para acceder a endpoints protegidos.",
+      "item": [
+        {
+          "name": "User Register",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"juan_perez\",\n  \"email\": \"juan.perez@email.com\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/user/auth/register",
+              "host": ["{{base_url}}"],
+              "path": ["user", "auth", "register"]
+            },
+            "description": "**Importancia:** Permite que nuevos usuarios se registren en la plataforma con rol USER.\n\n**Ejemplo de uso:** Un ciudadano que desea reportar animales o ser voluntario.\n\n**Response (201):**\n```json\n{\n  \"id\": 1,\n  \"username\": \"juan_perez\",\n  \"token\": \"eyJhbGci...\",\n  \"role\": \"USER\"\n}\n```"
+          }
+        },
+        {
+          "name": "User Login",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"juan_perez\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/user/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["user", "auth", "login"]
+            },
+            "description": "**Importancia:** Autentica usuarios existentes y genera token de sesión.\n\n**Ejemplo de uso:** Usuario regresa a la plataforma para inscribirse en programa de voluntariado.\n\n**⚠️ IMPORTANTE:** Copiar el token del response y guardarlo en la variable `{{token}}`"
+          }
+        },
+        {
+          "name": "Shelter Register",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Albergue Huellitas\",\n  \"email\": \"contacto@huellitas.com\",\n  \"password\": \"albergue123\",\n  \"address\": \"Av. Los Perros 123, Lima\",\n  \"phone\": 987654321\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/albergues/auth/register",
+              "host": ["{{base_url}}"],
+              "path": ["albergues", "auth", "register"]
+            },
+            "description": "**Importancia:** Permite que albergues se registren con rol ALBERGUE para gestionar animales y programas.\n\n**Ejemplo de uso:** Nueva organización de rescate animal se une a la plataforma."
+          }
+        },
+        {
+          "name": "Shelter Login",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"contacto@huellitas.com\",\n  \"password\": \"albergue123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/albergues/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["albergues", "auth", "login"]
+            },
+            "description": "**Importancia:** Autentica albergues para acceder a funciones administrativas.\n\n**⚠️ IMPORTANTE:** Guardar el token en variable `{{token}}`"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Shelters",
+      "description": "Endpoints para consultar y administrar información de albergues.",
+      "item": [
+        {
+          "name": "Get All Shelters",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/albergues",
+              "host": ["{{base_url}}"],
+              "path": ["albergues"]
+            },
+            "description": "**Importancia:** Endpoint público que lista todos los albergues. Permite a usuarios explorar opciones.\n\n**Ejemplo de uso:** Usuario busca albergues para adoptar o ser voluntario."
+          }
+        },
+        {
+          "name": "Get Shelters Near",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/albergues/near/-12.0464/-77.0428",
+              "host": ["{{base_url}}"],
+              "path": ["albergues", "near", "-12.0464", "-77.0428"]
+            },
+            "description": "**Importancia:** Encuentra albergues cercanos por geolocalización. Facilita adopciones locales.\n\n**Parámetros:** latitude, longitude\n\n**Ejemplo:** Buscar albergues cerca de Lima centro."
+          }
+        },
+        {
+          "name": "Delete Shelter",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/albergues/Albergue Huellitas",
+              "host": ["{{base_url}}"],
+              "path": ["albergues", "Albergue Huellitas"]
+            },
+            "description": "**Importancia:** Permite a albergues darse de baja.\n\n**Autorización:** 🔒 Requiere rol ALBERGUE\n\n**⚠️ Advertencia:** Acción irreversible."
+          }
+        },
+        {
+          "name": "Update Available Seats",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/albergues/mascotas_registradas/35/Albergue Huellitas",
+              "host": ["{{base_url}}"],
+              "path": ["albergues", "mascotas_registradas", "35", "Albergue Huellitas"]
+            },
+            "description": "**Importancia:** Actualiza número de mascotas registradas para calcular disponibilidad.\n\n**Autorización:** 🔒 Requiere rol ALBERGUE\n\n**Ejemplo:** Albergue recibe 5 animales nuevos y actualiza de 30 a 35."
+          }
+        },
+        {
+          "name": "Update Address",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/albergues/actualizacion_address/Av. Nueva 456/Albergue Huellitas",
+              "host": ["{{base_url}}"],
+              "path": ["albergues", "actualizacion_address", "Av. Nueva 456", "Albergue Huellitas"]
+            },
+            "description": "**Importancia:** Mantiene información de ubicación actualizada.\n\n**Autorización:** 🔒 Requiere rol ALBERGUE"
+          }
+        },
+        {
+          "name": "Update Phone",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/albergues/actualizacion_telefono/999888777/Albergue Huellitas",
+              "host": ["{{base_url}}"],
+              "path": ["albergues", "actualizacion_telefono", "999888777", "Albergue Huellitas"]
+            },
+            "description": "**Importancia:** Actualiza teléfono de contacto para facilitar comunicación.\n\n**Autorización:** 🔒 Requiere rol ALBERGUE"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Animals",
+      "description": "Endpoints para reportar y administrar animales.",
+      "item": [
+        {
+          "name": "Create Report",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Firulais\",\n  \"species\": \"Perro\",\n  \"breed\": \"Mestizo\",\n  \"age\": 3,\n  \"description\": \"Perro encontrado en Av. Larco\",\n  \"location\": \"Miraflores, Lima\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/user/report",
+              "host": ["{{base_url}}"],
+              "path": ["user", "report"]
+            },
+            "description": "**Importancia:** Permite reportar animales encontrados. No requiere autenticación para facilitar reportes rápidos.\n\n**Ejemplo de uso:** Ciudadano encuentra perro abandonado y lo reporta para que albergues lo rescaten."
+          }
+        },
+        {
+          "name": "Assign Shelter to Animal",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/animales/Firulais/asignar/Albergue Huellitas",
+              "host": ["{{base_url}}"],
+              "path": ["animales", "Firulais", "asignar", "Albergue Huellitas"]
+            },
+            "description": "**Importancia:** Permite a albergues reclamar animales reportados y hacerse responsables.\n\n**Autorización:** 🔒 Requiere rol ALBERGUE\n\n**Ejemplo:** Albergue ve reporte de perro abandonado y lo asigna a su refugio."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Posts",
+      "description": "Endpoints para crear y consultar publicaciones sobre mascotas.",
+      "item": [
+        {
+          "name": "Get All Posts",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/posts",
+              "host": ["{{base_url}}"],
+              "path": ["posts"]
+            },
+            "description": "**Importancia:** Muestra todas las publicaciones de todos los albergues. Feed principal público.\n\n**Ejemplo de uso:** Usuario explora historias de adopción y animales disponibles."
+          }
+        },
+        {
+          "name": "Get Post by Title",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/posts/Adopta a Max",
+              "host": ["{{base_url}}"],
+              "path": ["posts", "Adopta a Max"]
+            },
+            "description": "**Importancia:** Permite acceder a un post específico. Útil para compartir links directos.\n\n**Ejemplo:** Usuario comparte link de mascota específica en redes sociales."
+          }
+        },
+        {
+          "name": "Get Posts by Shelter",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/posts/albergue/Albergue Huellitas",
+              "host": ["{{base_url}}"],
+              "path": ["posts", "albergue", "Albergue Huellitas"]
+            },
+            "description": "**Importancia:** Obtiene todos los posts de un albergue específico.\n\n**Ejemplo:** Usuario interesado en albergue específico ve todas sus publicaciones."
+          }
+        },
+        {
+          "name": "Create Post",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Adopta a Max\",\n  \"content\": \"Max es un perro de 2 años buscando hogar\",\n  \"imageUrl\": \"https://example.com/max.jpg\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/posts/Albergue Huellitas",
+              "host": ["{{base_url}}"],
+              "path": ["posts", "Albergue Huellitas"]
+            },
+            "description": "**Importancia:** Permite a albergues crear publicaciones para difundir animales en adopción.\n\n**Autorización:** 🔒 Requiere rol ALBERGUE\n\n**Ejemplo:** Albergue publica sobre perro disponible para adopción."
+          }
+        },
+        {
+          "name": "Delete Post",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/posts/delete/Adopta a Max",
+              "host": ["{{base_url}}"],
+              "path": ["posts", "delete", "Adopta a Max"]
+            },
+            "description": "**Importancia:** Permite eliminar posts cuando animal es adoptado o post ya no es relevante.\n\n**Autorización:** 🔒 Requiere rol ALBERGUE"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Comments",
+      "description": "Endpoints para gestionar comentarios en publicaciones.",
+      "item": [
+        {
+          "name": "Get Comments by Username",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/comentarios/juan_perez",
+              "host": ["{{base_url}}"],
+              "path": ["comentarios", "juan_perez"]
+            },
+            "description": "**Importancia:** Obtiene todos los comentarios realizados por un usuario específico.\n\n**Ejemplo de uso:** Ver historial de interacciones de un usuario en la plataforma."
+          }
+        },
+        {
+          "name": "Get Comments by Post",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/comentarios/by_post/Adopta a Max",
+              "host": ["{{base_url}}"],
+              "path": ["comentarios", "by_post", "Adopta a Max"]
+            },
+            "description": "**Importancia:** Muestra todos los comentarios de un post específico. Permite ver discusiones.\n\n**Ejemplo:** Usuario lee comentarios para obtener más información sobre mascota."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Volunteer Programs",
+      "description": "Endpoints para gestionar programas de voluntariado.",
+      "item": [
+        {
+          "name": "Get All Programs",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/programas",
+              "host": ["{{base_url}}"],
+              "path": ["programas"]
+            },
+            "description": "**Importancia:** Lista todos los programas de voluntariado disponibles.\n\n**Ejemplo de uso:** Usuario busca oportunidades de voluntariado en albergues."
+          }
+        },
+        {
+          "name": "Get Volunteers in Program",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/programas/1/voluntarios",
+              "host": ["{{base_url}}"],
+              "path": ["programas", "1", "voluntarios"]
+            },
+            "description": "**Importancia:** Lista voluntarios inscritos en un programa específico.\n\n**Ejemplo:** Albergue revisa lista de voluntarios confirmados para programa."
+          }
+        },
+        {
+          "name": "Create Program",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Programa de Paseo Canino\",\n  \"description\": \"Ayuda a pasear a nuestros perros los fines de semana\",\n  \"startDate\": \"2025-11-01\",\n  \"endDate\": \"2025-12-31\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/programas",
+              "host": ["{{base_url}}"],
+              "path": ["programas"]
+            },
+            "description": "**Importancia:** Permite a albergues crear programas de voluntariado.\n\n**Autorización:** 🔒 Requiere rol ALBERGUE\n\n**Ejemplo:** Albergue necesita voluntarios para pasear perros los fines de semana."
+          }
+        },
+        {
+          "name": "Enroll in Program",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/programas/1/inscripcion?voluntarioId=1",
+              "host": ["{{base_url}}"],
+              "path": ["programas", "1", "inscripcion"],
+              "query": [
+                {
+                  "key": "voluntarioId",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": "**Importancia:** Permite a usuarios inscribirse como voluntarios en programas.\n\n**Autorización:** 🔒 Requiere rol USER\n\n**Ejemplo:** Usuario se inscribe en programa de paseo de perros."
+          }
+        },
+        {
+          "name": "Unsubscribe from Program (User)",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/programas/1/inscripcion?voluntarioId=1",
+              "host": ["{{base_url}}"],
+              "path": ["programas", "1", "inscripcion"],
+              "query": [
+                {
+                  "key": "voluntarioId",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": "**Importancia:** Permite a usuarios desinscribirse de programas.\n\n**Autorización:** 🔒 Requiere rol USER\n\n**Ejemplo:** Usuario ya no puede asistir y cancela su inscripción."
+          }
+        },
+        {
+          "name": "Remove Volunteer from Program (Shelter)",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/programas/alberge/1?voluntarioId=1",
+              "host": ["{{base_url}}"],
+              "path": ["programas", "alberge", "1"],
+              "query": [
+                {
+                  "key": "voluntarioId",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": "**Importancia:** Permite a albergues remover voluntarios de programas.\n\n**Autorización:** 🔒 Requiere rol ALBERGUE\n\n**Ejemplo:** Voluntario no cumple compromisos y es removido del programa."
+          }
+        },
+        {
+          "name": "Cancel My Inscription",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/programas/1/insctipciones",
+              "host": ["{{base_url}}"],
+              "path": ["programas", "1", "insctipciones"]
+            },
+            "description": "**Importancia:** Permite cancelar inscripción usando username del token.\n\n**Autorización:** 🔒 Requiere autenticación\n\n**Ejemplo:** Usuario autenticado cancela su propia inscripción."
+          }
+        },
+        {
+          "name": "Delete Program (Shelter)",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/programas/albergue/1",
+              "host": ["{{base_url}}"],
+              "path": ["programas", "albergue", "1"]
+            },
+            "description": "**Importancia:** Permite a albergues eliminar programas completos.\n\n**Autorización:** 🔒 Requiere rol ALBERGUE\n\n**Ejemplo:** Programa se cancela y albergue lo elimina de la plataforma."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Volunteers",
+      "description": "Endpoints para consultar información de voluntarios.",
+      "item": [
+        {
+          "name": "Get All Volunteers",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/voluntarios",
+              "host": ["{{base_url}}"],
+              "path": ["voluntarios"]
+            },
+            "description": "**Importancia:** Lista todos los voluntarios registrados en la plataforma.\n\n**Ejemplo de uso:** Ver comunidad de voluntarios activos."
+          }
+        },
+        {
+          "name": "Get Programs by Volunteer",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/voluntarios/1/programas",
+              "host": ["{{base_url}}"],
+              "path": ["voluntarios", "1", "programas"]
+            },
+            "description": "**Importancia:** Muestra todos los programas en los que está inscrito un voluntario.\n\n**Ejemplo:** Ver compromiso y participación de un voluntario específico."
+          }
+        }
+      ]
+    }
+  ]
+}
